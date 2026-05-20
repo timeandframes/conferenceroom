@@ -15,11 +15,19 @@
       --text-primary: #1a1a18;
       --text-secondary: #6b6b67;
       --text-tertiary: #9e9e9a;
-      --border-tertiary: rgba(0,0,0,0.1);
-      --border-secondary: rgba(0,0,0,0.18);
+      --border-tertiary: rgba(0,0,0,0.09);
+      --border-secondary: rgba(0,0,0,0.16);
+      --green: #1D9E75;
+      --green-dark: #0F6E56;
+      --green-pale: #E1F5EE;
+      --green-mid: #9FE1CB;
+      --red-pale: #FAECE7;
+      --red-mid: #F0997B;
+      --red-dark: #712B13;
+      --red-darker: #993C1D;
       --radius-md: 8px;
       --radius-lg: 12px;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -30,8 +38,10 @@
         --text-primary: #f0efe8;
         --text-secondary: #a0a09a;
         --text-tertiary: #6a6a65;
-        --border-tertiary: rgba(255,255,255,0.08);
-        --border-secondary: rgba(255,255,255,0.15);
+        --border-tertiary: rgba(255,255,255,0.07);
+        --border-secondary: rgba(255,255,255,0.14);
+        --green-pale: rgba(29,158,117,0.14);
+        --red-pale: rgba(240,153,123,0.12);
       }
     }
 
@@ -40,38 +50,114 @@
       background: var(--bg-tertiary);
       color: var(--text-primary);
       min-height: 100vh;
-      padding: 0 0 5rem;
+      padding-bottom: 5rem;
+      -webkit-font-smoothing: antialiased;
     }
 
     .app { max-width: 680px; margin: 0 auto; background: var(--bg-tertiary); }
 
-    /* Topbar */
+    /* ── Topbar ── */
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 1.25rem 0.75rem;
+      padding: 0.9rem 1.25rem 0.8rem;
       background: var(--bg-primary);
       border-bottom: 0.5px solid var(--border-tertiary);
       margin-bottom: 1.25rem;
-      position: sticky; top: 0; z-index: 10;
+      position: sticky; top: 0; z-index: 20;
     }
     .topbar-logo { display: flex; align-items: center; gap: 10px; }
-    .logo-dot { width: 32px; height: 32px; border-radius: 8px; background: #1D9E75; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-dot { width: 32px; height: 32px; border-radius: 8px; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .logo-dot i { font-size: 17px; color: #fff; }
     .logo-text { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
     .logo-sub { font-size: 10px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 1px; }
-    .topbar-date { font-size: 12px; color: var(--text-secondary); text-align: right; line-height: 1.6; flex-shrink: 0; }
-    .topbar-date strong { color: var(--text-primary); font-size: 13px; display: block; }
 
-    /* Toast */
+    /* Single-line date display — Apple style */
+    .topbar-date {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .topbar-date .date-main {
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    .topbar-date .date-sep { opacity: 0.35; }
+
+    /* ── Toast ── */
     .toast-bar {
       background: #085041; color: #E1F5EE; font-size: 13px;
       padding: 10px 1.25rem; margin: 0 1.25rem 1rem;
       border-radius: var(--radius-md);
       display: none; align-items: center; gap: 8px;
+      animation: slideDown 0.2s ease;
     }
     .toast-bar.show { display: flex; }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
 
-    /* Room banner */
+    /* ── Date strip ── */
+    .date-strip-wrap {
+      margin: 0 1.25rem 1.25rem;
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-tertiary);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1rem 0.85rem;
+    }
+    .date-strip-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .date-strip-label {
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .date-nav { display: flex; align-items: center; gap: 4px; }
+    .date-nav-btn {
+      width: 28px; height: 28px; border-radius: 6px; border: 0.5px solid var(--border-tertiary);
+      background: transparent; color: var(--text-secondary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      transition: background 0.12s;
+    }
+    .date-nav-btn:hover { background: var(--bg-secondary); }
+    .date-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .date-nav-label {
+      font-size: 12px; font-weight: 600; color: var(--text-primary);
+      padding: 0 6px; min-width: 80px; text-align: center;
+    }
+
+    .date-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .date-scroll::-webkit-scrollbar { display: none; }
+    .date-days { display: flex; gap: 6px; min-width: max-content; }
+    .day-pill {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 7px 10px; border-radius: 10px; cursor: pointer;
+      min-width: 46px; border: 0.5px solid transparent;
+      transition: background 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+    .day-pill:hover { background: var(--bg-secondary); }
+    .day-pill.active {
+      background: var(--green); border-color: var(--green);
+    }
+    .day-pill.today-pill:not(.active) {
+      border-color: var(--green);
+    }
+    .day-pill-dow {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-tertiary); margin-bottom: 3px;
+    }
+    .day-pill.active .day-pill-dow { color: rgba(255,255,255,0.7); }
+    .day-pill-num {
+      font-size: 15px; font-weight: 700; color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .day-pill.active .day-pill-num { color: #fff; }
+    .day-pill-dot {
+      width: 4px; height: 4px; border-radius: 50%; margin-top: 4px;
+      background: transparent;
+    }
+    .day-pill.has-bookings .day-pill-dot { background: var(--green-mid); }
+    .day-pill.active .day-pill-dot { background: rgba(255,255,255,0.5); }
+
+    /* ── Room banner ── */
     .room-banner {
       margin: 0 1.25rem 1.25rem;
       background: var(--bg-primary);
@@ -81,15 +167,15 @@
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .room-banner-left { display: flex; align-items: center; gap: 12px; }
-    .room-icon { width: 42px; height: 42px; border-radius: 10px; background: #E1F5EE; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .room-icon i { font-size: 20px; color: #0F6E56; }
+    .room-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .room-icon i { font-size: 20px; color: var(--green-dark); }
     .room-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
     .room-meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5; }
     .room-status-badge { font-size: 12px; padding: 5px 12px; border-radius: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
-    .badge-free { background: #E1F5EE; color: #085041; }
-    .badge-busy { background: #FAECE7; color: #712B13; }
+    .badge-free { background: var(--green-pale); color: #085041; }
+    .badge-busy { background: var(--red-pale); color: var(--red-dark); }
 
-    /* Section headers */
+    /* ── Section headers ── */
     .section-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 1.25rem; margin-bottom: 0.75rem;
@@ -97,20 +183,21 @@
     .section-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.07em; text-transform: uppercase; }
     .btn-new {
       font-size: 13px; padding: 6px 14px; cursor: pointer;
-      border: 0.5px solid #1D9E75; border-radius: var(--radius-md);
-      background: transparent; color: #0F6E56;
+      border: 0.5px solid var(--green); border-radius: var(--radius-md);
+      background: transparent; color: var(--green-dark);
       display: inline-flex; align-items: center; gap: 5px;
+      transition: background 0.12s;
     }
-    .btn-new:hover { background: #E1F5EE; }
+    .btn-new:hover { background: var(--green-pale); }
 
-    /* Timeline */
+    /* ── Timeline ── */
     .timeline-wrap { padding: 0 1.25rem; margin-bottom: 1.5rem; }
     .timeline-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
 
     .timeline-scroll-wrap { overflow-x: auto; border-radius: var(--radius-md); }
     .timeline-scroll-wrap::-webkit-scrollbar { height: 4px; }
     .timeline-scroll-wrap::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    .timeline-scroll-wrap::-webkit-scrollbar-thumb { background: #9FE1CB; border-radius: 2px; }
+    .timeline-scroll-wrap::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 2px; }
 
     .timeline-grid {
       display: grid;
@@ -120,36 +207,41 @@
       padding: 6px;
       min-width: max-content;
     }
+
+    /* ── Apple-style single-line slot ── */
     .tslot {
-      height: 34px; width: 52px; border-radius: 4px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: background 0.12s;
+      height: 34px; width: 58px; border-radius: 5px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.1s, transform 0.08s;
       user-select: none;
+      font-size: 11px; font-weight: 500; letter-spacing: -0.01em;
+      white-space: nowrap;
     }
-    .tslot .slot-hour { font-size: 9px; font-weight: 600; line-height: 1; }
-    .tslot .slot-min  { font-size: 8px; line-height: 1; margin-top: 1px; opacity: 0.75; }
-    .tslot.free     { background: #E1F5EE; color: #0F6E56; }
-    .tslot.free:hover { background: #9FE1CB; }
-    .tslot.booked   { background: #FAECE7; color: #993C1D; cursor: default; }
-    .tslot.selected { background: #1D9E75; color: #fff; }
+    .tslot:active { transform: scale(0.94); }
+    .tslot.free     { background: var(--green-pale); color: var(--green-dark); }
+    .tslot.free:hover { background: var(--green-mid); }
+    .tslot.booked   { background: var(--red-pale); color: var(--red-darker); cursor: default; }
+    .tslot.selected { background: var(--green); color: #fff; }
+    .tslot.past     { background: var(--bg-tertiary); color: var(--text-tertiary); cursor: default; opacity: 0.6; }
 
     .tslot-book-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-    .legend { display: flex; gap: 14px; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
     .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
     .btn-sm {
-      font-size: 12px; color: #0F6E56; border: 0.5px solid #0F6E56;
+      font-size: 12px; color: var(--green-dark); border: 0.5px solid var(--green-dark);
       background: transparent; border-radius: var(--radius-md);
       padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+      transition: background 0.12s;
     }
-    .btn-sm:hover { background: #E1F5EE; }
+    .btn-sm:hover { background: var(--green-pale); }
 
-    /* Filter tabs */
+    /* ── Filter tabs ── */
     .filter-tabs { display: flex; gap: 4px; padding: 0 1.25rem; margin-bottom: 1rem; }
-    .ftab { font-size: 12px; padding: 5px 13px; border-radius: 16px; cursor: pointer; border: 0.5px solid var(--border-tertiary); background: transparent; color: var(--text-secondary); }
+    .ftab { font-size: 12px; padding: 5px 13px; border-radius: 16px; cursor: pointer; border: 0.5px solid var(--border-tertiary); background: transparent; color: var(--text-secondary); transition: background 0.12s; }
     .ftab.active { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-secondary); font-weight: 500; }
 
-    /* Booking cards */
+    /* ── Booking cards ── */
     .bookings-list { padding: 0 1.25rem; display: flex; flex-direction: column; gap: 10px; }
     .booking-card {
       background: var(--bg-primary); border: 0.5px solid var(--border-tertiary);
@@ -157,34 +249,40 @@
       cursor: pointer; transition: border-color 0.15s;
     }
     .booking-card:hover { border-color: var(--border-secondary); }
-    .booking-card.mine  { border-left: 3px solid #1D9E75; border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
-    .booking-card.other { border-left: 3px solid #F0997B; border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+    .booking-card.mine  { border-left: 3px solid var(--green); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+    .booking-card.other { border-left: 3px solid var(--red-mid); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
     .bc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
     .bc-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-    .bc-time  { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .bc-meta-row { display: flex; align-items: center; gap: 10px; margin-top: 3px; flex-wrap: wrap; }
+    .bc-time  { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+    .bc-date-tag {
+      font-size: 11px; padding: 2px 7px; border-radius: 8px;
+      background: var(--bg-secondary); color: var(--text-tertiary); font-weight: 500;
+    }
     .bc-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
-    .badge-mine  { background: #E1F5EE; color: #085041; }
-    .badge-other { background: #FAECE7; color: #712B13; }
+    .badge-mine  { background: var(--green-pale); color: #085041; }
+    .badge-other { background: var(--red-pale); color: var(--red-dark); }
     .bc-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-    .bc-avatar { width: 24px; height: 24px; border-radius: 50%; background: #E1F5EE; color: #085041; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
-    .bc-avatar.other { background: #FAECE7; color: #712B13; }
+    .bc-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--green-pale); color: #085041; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+    .bc-avatar.other { background: var(--red-pale); color: var(--red-dark); }
     .bc-name { font-size: 13px; color: var(--text-secondary); }
     .bc-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .bc-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--radius-md); cursor: pointer; border: 0.5px solid var(--border-secondary); background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px; }
+    .bc-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--radius-md); cursor: pointer; border: 0.5px solid var(--border-secondary); background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px; transition: background 0.12s; }
     .bc-btn:hover { background: var(--bg-secondary); }
-    .bc-btn.primary { color: #0F6E56; border-color: #5DCAA5; }
-    .bc-btn.primary:hover { background: #E1F5EE; }
-    .bc-btn.danger  { color: #993C1D; border-color: #F0997B; }
-    .bc-btn.danger:hover { background: #FAECE7; }
+    .bc-btn.primary { color: var(--green-dark); border-color: #5DCAA5; }
+    .bc-btn.primary:hover { background: var(--green-pale); }
+    .bc-btn.danger  { color: var(--red-darker); border-color: var(--red-mid); }
+    .bc-btn.danger:hover { background: var(--red-pale); }
 
     .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); font-size: 14px; }
     .empty-state i { font-size: 36px; display: block; margin-bottom: 10px; color: var(--text-tertiary); }
     .empty-state p { margin-top: 4px; font-size: 13px; color: var(--text-tertiary); }
 
-    /* Modal */
-    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; padding: 1rem; }
+    /* ── Modal ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.38); align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(2px); }
     .modal-overlay.open { display: flex; }
-    .modal { background: var(--bg-primary); border-radius: var(--radius-lg); border: 0.5px solid var(--border-tertiary); width: 100%; max-width: 440px; padding: 1.5rem; max-height: 92vh; overflow-y: auto; }
+    .modal { background: var(--bg-primary); border-radius: 16px; border: 0.5px solid var(--border-tertiary); width: 100%; max-width: 440px; padding: 1.5rem; max-height: 92vh; overflow-y: auto; animation: modalIn 0.18s ease; }
+    @keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:none; } }
     .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
     .modal label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px; margin-top: 14px; }
     .modal input, .modal select, .modal textarea {
@@ -192,13 +290,13 @@
       border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md);
       background: var(--bg-secondary); padding: 8px 10px; font-family: var(--font-sans); outline: none;
     }
-    .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: #1D9E75; box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+    .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2.5px rgba(29,158,117,0.12); }
     .modal textarea { min-height: 70px; resize: vertical; }
     .modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; justify-content: flex-end; }
-    .btn-cancel { font-size: 13px; padding: 8px 16px; cursor: pointer; border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md); background: transparent; color: var(--text-secondary); }
+    .btn-cancel { font-size: 13px; padding: 8px 16px; cursor: pointer; border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md); background: transparent; color: var(--text-secondary); transition: background 0.12s; }
     .btn-cancel:hover { background: var(--bg-secondary); }
-    .btn-confirm { font-size: 13px; padding: 8px 18px; cursor: pointer; border: none; border-radius: var(--radius-md); background: #1D9E75; color: #fff; font-weight: 600; }
-    .btn-confirm:hover { background: #0F6E56; }
+    .btn-confirm { font-size: 13px; padding: 8px 18px; cursor: pointer; border: none; border-radius: var(--radius-md); background: var(--green); color: #fff; font-weight: 600; transition: background 0.12s; }
+    .btn-confirm:hover { background: var(--green-dark); }
 
     .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
     .detail-row:last-child { border-bottom: none; }
@@ -210,7 +308,7 @@
 
     @media (max-width: 500px) {
       .topbar { padding: 0.75rem 1rem; }
-      .room-banner, .toast-bar { margin-left: 1rem; margin-right: 1rem; }
+      .room-banner, .toast-bar, .date-strip-wrap { margin-left: 1rem; margin-right: 1rem; }
       .section-header, .timeline-wrap, .bookings-list, .filter-tabs { padding-left: 1rem; padding-right: 1rem; }
       .logo-text { font-size: 13px; }
     }
@@ -229,8 +327,9 @@
       </div>
     </div>
     <div class="topbar-date">
-      <strong id="today-date"></strong>
-      <span id="today-day"></span>
+      <span class="date-main" id="topbar-date-str"></span>
+      <span class="date-sep">·</span>
+      <span id="topbar-day-str" style="font-size:12px;"></span>
     </div>
   </div>
 
@@ -239,6 +338,22 @@
     <span id="toast-msg"></span>
   </div>
 
+  <!-- Date strip -->
+  <div class="date-strip-wrap">
+    <div class="date-strip-header">
+      <span class="date-strip-label" id="strip-month-label"></span>
+      <div class="date-nav">
+        <button class="date-nav-btn" id="nav-prev" onclick="shiftWeek(-1)"><i class="ti ti-chevron-left"></i></button>
+        <span class="date-nav-label" id="nav-range-label"></span>
+        <button class="date-nav-btn" id="nav-next" onclick="shiftWeek(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+    <div class="date-scroll">
+      <div class="date-days" id="date-days"></div>
+    </div>
+  </div>
+
+  <!-- Room banner -->
   <div class="room-banner">
     <div class="room-banner-left">
       <div class="room-icon"><i class="ti ti-layout-board"></i></div>
@@ -250,23 +365,24 @@
     <span class="room-status-badge" id="room-status-badge"></span>
   </div>
 
+  <!-- Timeline section -->
   <div class="section-header">
-    <span class="section-title">Today's availability</span>
+    <span class="section-title" id="avail-section-title">Availability</span>
     <button class="btn-new" onclick="openBookModal()">
       <i class="ti ti-plus" style="font-size:13px;"></i> New booking
     </button>
   </div>
 
   <div class="timeline-wrap">
-    <div class="timeline-label">Tap free slots to select, then book &nbsp;·&nbsp; 15-min intervals (9:00 AM – 6:00 PM)</div>
+    <div class="timeline-label" id="timeline-label">Tap free slots to select, then book &nbsp;·&nbsp; 15-min intervals (9:00 AM – 6:00 PM)</div>
     <div class="timeline-scroll-wrap">
       <div class="timeline-grid" id="timeline-grid"></div>
     </div>
     <div class="tslot-book-row">
       <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#E1F5EE;border:1px solid #9FE1CB;"></div>Free</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#1D9E75;"></div>Selected</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#FAECE7;border:1px solid #F0997B;"></div>Booked</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green-pale);border:1px solid var(--green-mid);"></div>Free</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Selected</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red-pale);border:1px solid var(--red-mid);"></div>Booked</div>
       </div>
       <button class="btn-sm" id="book-sel-btn" style="display:none;" onclick="openBookModal()">
         <i class="ti ti-plus" style="font-size:13px;"></i> Book selected
@@ -274,6 +390,7 @@
     </div>
   </div>
 
+  <!-- Bookings -->
   <div class="section-header">
     <span class="section-title">Bookings</span>
     <span id="booking-count" style="font-size:12px;color:var(--text-secondary);"></span>
@@ -282,7 +399,7 @@
   <div class="filter-tabs">
     <button class="ftab active" onclick="setFilter('all',this)">All</button>
     <button class="ftab" onclick="setFilter('mine',this)">Mine</button>
-    <button class="ftab" onclick="setFilter('today',this)">Today</button>
+    <button class="ftab" onclick="setFilter('selected',this)">This day</button>
   </div>
 
   <div class="bookings-list" id="bookings-list"></div>
@@ -293,126 +410,265 @@
 </div>
 
 <script>
-  // ── Config ──────────────────────────────────────────────
+  // ── Config ─────────────────────────────────────────────────
   const ME = "You", MI = "YO";
-  const DAY_START = 9;   // 9:00 AM
-  const DAY_END   = 18;  // 6:00 PM
-  // Generate 15-min slots: [{index, hour, min, label, shortLabel}]
+  const STORAGE_KEY = "hsrhub_bookings_v2";
+  const DAY_START = 9, DAY_END = 18;
+  const DAYS_LABEL = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const MONTHS_LABEL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  // Build 15-min slots
   const SLOTS = [];
   for (let h = DAY_START; h < DAY_END; h++) {
     for (let m = 0; m < 60; m += 15) {
-      const idx = SLOTS.length;
       const ampm = h >= 12 ? "PM" : "AM";
       const h12  = h > 12 ? h - 12 : (h === 0 ? 12 : h);
-      const mm   = m === 0 ? "00" : String(m);
+      const mm   = String(m).padStart(2, "0");
       SLOTS.push({
-        index: idx,
-        hour: h,
-        min: m,
+        index: SLOTS.length,
+        hour: h, min: m,
         label: `${h12}:${mm} ${ampm}`,
-        shortH: String(h12),
-        shortM: m === 0 ? ":00" : `:${mm}`
+        // Single-line compact: "9:00" / "12:30"
+        compact: `${h12}:${mm}`
       });
     }
   }
-  const TOTAL_SLOTS = SLOTS.length; // 36 slots
+  const TOTAL_SLOTS = SLOTS.length;
 
-  function slotIndex(hour, min) {
-    return SLOTS.findIndex(s => s.hour === hour && s.min === min);
+  function slotIndex(h, m) { return SLOTS.findIndex(s => s.hour === h && s.min === m); }
+  function slotLabel(idx)  { return (idx >= 0 && idx < SLOTS.length) ? SLOTS[idx].label : "—"; }
+
+  // ── Date helpers ────────────────────────────────────────────
+  function dateKey(d) {
+    // YYYY-MM-DD
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   }
-  function slotLabel(idx) { return idx >= 0 && idx < SLOTS.length ? SLOTS[idx].label : "—"; }
+  function todayKey() { return dateKey(new Date()); }
+  function keyToDate(k) {
+    const [y,mo,d] = k.split("-").map(Number);
+    return new Date(y, mo-1, d);
+  }
+  function isFuture(k) { return k >= todayKey(); }
 
-  // ── State ────────────────────────────────────────────────
-  let selectedSlots = []; // array of slot indices (contiguous)
+  // ── Persistence ─────────────────────────────────────────────
+  function loadBookings() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+  function saveBookings() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings)); } catch {}
+  }
+
+  // ── State ───────────────────────────────────────────────────
+  let bookings      = loadBookings();
+  let nextId        = bookings.length ? Math.max(...bookings.map(b => b.id)) + 1 : 1;
+  let selectedSlots = [];
   let currentFilter = "all";
-  let nextId = 1;
-  let bookings = []; // empty — no preloaded data
+  let stripOffset   = 0;   // week offset from today
+  let selectedDate  = todayKey();
 
-  // ── Helpers ──────────────────────────────────────────────
-  function isBooked(idx) {
-    return bookings.some(b => b.date === "today" && idx >= b.startIdx && idx < b.endIdx);
+  // ── Helpers ─────────────────────────────────────────────────
+  function bookingsForDate(dk) {
+    return bookings.filter(b => b.date === dk);
   }
-  function bookingAt(idx) {
-    return bookings.find(b => b.date === "today" && idx >= b.startIdx && idx < b.endIdx);
+  function isBooked(idx, dk) {
+    return bookingsForDate(dk).some(b => idx >= b.startIdx && idx < b.endIdx);
   }
-  function isRoomFree() {
+  function bookingAt(idx, dk) {
+    return bookingsForDate(dk).find(b => idx >= b.startIdx && idx < b.endIdx);
+  }
+  function isRoomFreeNow() {
     const now = new Date();
     const h = now.getHours(), m = now.getMinutes();
     const roundM = Math.floor(m / 15) * 15;
     const idx = slotIndex(h, roundM);
     if (idx < 0) return true;
-    return !isBooked(idx);
+    return !isBooked(idx, todayKey());
   }
-  function durationLabel(startIdx, endIdx) {
-    const mins = (endIdx - startIdx) * 15;
+  function isPastSlot(slot) {
+    if (selectedDate !== todayKey()) return false;
+    const now = new Date();
+    const slotTime = new Date(); slotTime.setHours(slot.hour, slot.min, 0, 0);
+    return slotTime < now;
+  }
+  function durationLabel(s, e) {
+    const mins = (e - s) * 15;
     if (mins < 60) return `${mins} min`;
-    const h = Math.floor(mins / 60), rem = mins % 60;
-    return rem ? `${h}h ${rem}m` : `${h}h`;
+    const h = Math.floor(mins/60), r = mins%60;
+    return r ? `${h}h ${r}m` : `${h}h`;
+  }
+  function friendlyDate(dk) {
+    const tk = todayKey();
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    const tmKey = dateKey(tomorrow);
+    if (dk === tk) return "Today";
+    if (dk === tmKey) return "Tomorrow";
+    const d = keyToDate(dk);
+    return `${DAYS_LABEL[d.getDay()]}, ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
   }
 
-  // ── Render room status ───────────────────────────────────
+  // ── Topbar date ─────────────────────────────────────────────
+  function updateTopbar() {
+    const d = keyToDate(selectedDate);
+    document.getElementById("topbar-date-str").textContent =
+      `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+    document.getElementById("topbar-day-str").textContent = DAYS_LABEL[d.getDay()];
+  }
+
+  // ── Date strip ──────────────────────────────────────────────
+  function buildStrip() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const startDay = new Date(today);
+    startDay.setDate(today.getDate() + stripOffset * 7);
+
+    // Show 14 days from startDay
+    const days = [];
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(startDay);
+      d.setDate(startDay.getDate() + i);
+      days.push(d);
+    }
+
+    const firstDay = days[0], lastDay = days[days.length-1];
+    // Range label
+    const rangeStr = firstDay.getMonth() === lastDay.getMonth()
+      ? `${MONTHS_SHORT[firstDay.getMonth()]} ${firstDay.getFullYear()}`
+      : `${MONTHS_SHORT[firstDay.getMonth()]} – ${MONTHS_SHORT[lastDay.getMonth()]}`;
+    document.getElementById("nav-range-label").textContent = rangeStr;
+    document.getElementById("strip-month-label").textContent = "Select date";
+
+    // Disable prev if today would go before today
+    document.getElementById("nav-prev").disabled = stripOffset <= 0;
+
+    const container = document.getElementById("date-days");
+    container.innerHTML = "";
+
+    days.forEach(d => {
+      const dk = dateKey(d);
+      const isToday = dk === todayKey();
+      const isActive = dk === selectedDate;
+      const hasB = bookingsForDate(dk).length > 0;
+      const inPast = dk < todayKey();
+
+      const pill = document.createElement("div");
+      pill.className = "day-pill"
+        + (isActive ? " active" : "")
+        + (isToday && !isActive ? " today-pill" : "")
+        + (hasB ? " has-bookings" : "");
+      if (inPast && !isActive) pill.style.opacity = "0.45";
+
+      pill.innerHTML = `
+        <div class="day-pill-dow">${DAYS_LABEL[d.getDay()]}</div>
+        <div class="day-pill-num">${d.getDate()}</div>
+        <div class="day-pill-dot"></div>
+      `;
+      pill.onclick = () => selectDate(dk);
+      container.appendChild(pill);
+
+      // Scroll active into view
+      if (isActive) setTimeout(() => pill.scrollIntoView({ inline:"center", behavior:"smooth", block:"nearest" }), 50);
+    });
+  }
+
+  function shiftWeek(dir) {
+    if (dir < 0 && stripOffset <= 0) return;
+    stripOffset += dir;
+    buildStrip();
+  }
+
+  function selectDate(dk) {
+    selectedDate = dk;
+    selectedSlots = [];
+    updateTopbar();
+    buildStrip();
+    renderRoomStatus();
+    renderTimeline();
+    renderBookings();
+    updateSectionLabels();
+  }
+
+  function updateSectionLabels() {
+    const label = friendlyDate(selectedDate);
+    document.getElementById("avail-section-title").textContent =
+      label === "Today" ? "Today's availability" : `Availability — ${label}`;
+  }
+
+  // ── Room status ─────────────────────────────────────────────
   function renderRoomStatus() {
     const el = document.getElementById("room-status-badge");
-    const free = isRoomFree();
+    if (selectedDate !== todayKey()) {
+      const hasBks = bookingsForDate(selectedDate).length > 0;
+      el.textContent = hasBks ? "Has bookings" : "Open all day";
+      el.className = "room-status-badge " + (hasBks ? "badge-busy" : "badge-free");
+      return;
+    }
+    const free = isRoomFreeNow();
     el.textContent = free ? "Available now" : "In use";
     el.className = "room-status-badge " + (free ? "badge-free" : "badge-busy");
   }
 
-  // ── Render timeline ──────────────────────────────────────
+  // ── Timeline ────────────────────────────────────────────────
   function renderTimeline() {
     const grid = document.getElementById("timeline-grid");
-    // Show slots in rows of 8 (2 hours per row)
-    const cols = 8;
-    grid.style.gridTemplateColumns = `repeat(${cols}, 52px)`;
+    const cols = 9; // 9 cols = cleaner row breaks
+    grid.style.gridTemplateColumns = `repeat(${cols}, 58px)`;
+
     grid.innerHTML = SLOTS.map((s, i) => {
-      const booked = isBooked(i);
+      const past   = isPastSlot(s);
+      const booked = isBooked(i, selectedDate);
       const sel    = selectedSlots.includes(i);
+
       let cls = "tslot";
-      if (booked)    cls += " booked";
-      else if (sel)  cls += " selected";
-      else           cls += " free";
-      const b   = booked ? bookingAt(i) : null;
-      const tip = booked ? `${b.booker}: ${b.purpose}` : (sel ? "Selected" : "Available");
-      return `<div class="${cls}" onclick="toggleSlot(${i})" title="${s.label} — ${tip}">
-        <span class="slot-hour">${s.shortH}</span>
-        <span class="slot-min">${s.shortM}</span>
-      </div>`;
+      if      (booked) cls += " booked";
+      else if (past)   cls += " past";
+      else if (sel)    cls += " selected";
+      else             cls += " free";
+
+      const b   = booked ? bookingAt(i, selectedDate) : null;
+      const tip = booked ? `${b.booker}: ${b.purpose}` : (sel ? "Selected" : (past ? "Past" : "Available"));
+
+      return `<div class="${cls}" onclick="toggleSlot(${i})" title="${s.label} — ${tip}">${s.compact}</div>`;
     }).join("");
+
     document.getElementById("book-sel-btn").style.display = selectedSlots.length ? "inline-flex" : "none";
   }
 
   function toggleSlot(idx) {
-    if (isBooked(idx)) return;
+    const s = SLOTS[idx];
+    if (isPastSlot(s) || isBooked(idx, selectedDate)) return;
+
     const pos = selectedSlots.indexOf(idx);
     if (pos === -1) {
-      // Only allow contiguous selection
       if (selectedSlots.length === 0) {
         selectedSlots = [idx];
       } else {
         const mn = Math.min(...selectedSlots), mx = Math.max(...selectedSlots);
         if (idx === mn - 1 || idx === mx + 1) {
-          selectedSlots.push(idx);
-          selectedSlots.sort((a, b) => a - b);
+          selectedSlots.push(idx); selectedSlots.sort((a,b) => a-b);
         } else {
-          selectedSlots = [idx]; // restart selection
+          selectedSlots = [idx];
         }
       }
     } else {
-      // Only allow removing from edges
       const mn = Math.min(...selectedSlots), mx = Math.max(...selectedSlots);
-      if (idx === mn || idx === mx) {
-        selectedSlots.splice(pos, 1);
-      }
+      if (idx === mn || idx === mx) selectedSlots.splice(pos, 1);
     }
     renderTimeline();
   }
 
-  // ── Render bookings ──────────────────────────────────────
+  // ── Render bookings ─────────────────────────────────────────
   function renderBookings() {
     let filtered = [...bookings];
-    if (currentFilter === "mine")  filtered = filtered.filter(b => b.booker === ME);
-    if (currentFilter === "today") filtered = filtered.filter(b => b.date === "today");
-    filtered.sort((a, b) => a.startIdx - b.startIdx);
+    if (currentFilter === "mine")     filtered = filtered.filter(b => b.booker === ME);
+    if (currentFilter === "selected") filtered = filtered.filter(b => b.date === selectedDate);
+    filtered.sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      return a.startIdx - b.startIdx;
+    });
+
     document.getElementById("booking-count").textContent =
       `${filtered.length} booking${filtered.length !== 1 ? "s" : ""}`;
 
@@ -420,21 +676,26 @@
     if (!filtered.length) {
       list.innerHTML = `<div class="empty-state">
         <i class="ti ti-calendar-off"></i>
-        No bookings yet
+        No bookings ${currentFilter === "selected" ? "on this day" : "yet"}
         <p>Tap "New booking" to reserve the conference room.</p>
       </div>`;
       return;
     }
+
     list.innerHTML = filtered.map(b => {
       const mine = b.booker === ME;
       const dur  = durationLabel(b.startIdx, b.endIdx);
+      const dateTag = b.date !== selectedDate ? `<span class="bc-date-tag">${friendlyDate(b.date)}</span>` : "";
       return `<div class="booking-card ${mine ? "mine" : "other"}" onclick="openDetail(${b.id})">
         <div class="bc-top">
           <div>
             <div class="bc-title">${b.purpose}</div>
-            <div class="bc-time">
-              <i class="ti ti-clock" style="font-size:12px;vertical-align:-1px;"></i>
-              ${slotLabel(b.startIdx)} – ${slotLabel(b.endIdx)} &nbsp;·&nbsp; ${dur}
+            <div class="bc-meta-row">
+              <div class="bc-time">
+                <i class="ti ti-clock" style="font-size:11px;"></i>
+                ${slotLabel(b.startIdx)} – ${slotLabel(b.endIdx)} · ${dur}
+              </div>
+              ${dateTag}
             </div>
           </div>
           <span class="bc-badge ${mine ? "badge-mine" : "badge-other"}">${mine ? "Mine" : "Booked"}</span>
@@ -461,7 +722,7 @@
     renderBookings();
   }
 
-  // ── Modal helpers ────────────────────────────────────────
+  // ── Modal helpers ───────────────────────────────────────────
   function openModal(html) {
     document.getElementById("modal-inner").innerHTML = html;
     document.getElementById("modal-overlay").classList.add("open");
@@ -476,19 +737,23 @@
     bar.classList.add("show");
     setTimeout(() => bar.classList.remove("show"), 3200);
   }
-
-  // Build slot <select> options
   function slotOpts(selIdx) {
     return SLOTS.map((s, i) =>
       `<option value="${i}" ${i === selIdx ? "selected" : ""}>${s.label}</option>`
     ).join("");
   }
 
-  // ── Book modal ───────────────────────────────────────────
+  // ── Book modal ──────────────────────────────────────────────
   function openBookModal() {
     const defStart = selectedSlots.length ? Math.min(...selectedSlots) : slotIndex(9, 0);
     const defEnd   = selectedSlots.length ? Math.max(...selectedSlots) + 1 : slotIndex(10, 0);
-    openModal(`<h3><i class="ti ti-calendar-plus" style="color:#1D9E75;font-size:18px;"></i>Book conference room</h3>
+    const endClamped = defEnd >= TOTAL_SLOTS ? TOTAL_SLOTS - 1 : defEnd;
+
+    openModal(`
+      <h3><i class="ti ti-calendar-plus" style="color:var(--green);font-size:18px;"></i>Book conference room</h3>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:1rem;padding:8px 10px;background:var(--bg-secondary);border-radius:var(--radius-md);">
+        <i class="ti ti-calendar" style="font-size:12px;"></i> &nbsp;${friendlyDate(selectedDate)}
+      </div>
       <label>Your name *</label>
       <input type="text" id="f-name" placeholder="Enter your name" />
       <label>Purpose / meeting title *</label>
@@ -496,7 +761,7 @@
       <label>Start time *</label>
       <select id="f-start">${slotOpts(defStart)}</select>
       <label>End time *</label>
-      <select id="f-end">${slotOpts(defEnd >= TOTAL_SLOTS ? TOTAL_SLOTS - 1 : defEnd)}</select>
+      <select id="f-end">${slotOpts(endClamped)}</select>
       <label>Number of attendees</label>
       <input type="number" id="f-att" min="1" max="10" value="1" />
       <label>Notes (optional)</label>
@@ -519,8 +784,8 @@
 
     errEl.textContent = "";
     let err = false;
-    if (!name)    { document.getElementById("f-name").classList.add("error-outline"); err = true; }
-    if (!purpose) { document.getElementById("f-purpose").classList.add("error-outline"); err = true; }
+    if (!name)          { document.getElementById("f-name").classList.add("error-outline"); err = true; }
+    if (!purpose)       { document.getElementById("f-purpose").classList.add("error-outline"); err = true; }
     if (endIdx <= startIdx) {
       document.getElementById("f-end").classList.add("error-outline");
       errEl.textContent = "End time must be after start time."; err = true;
@@ -528,11 +793,11 @@
     if (err) return;
 
     // Conflict check
-    const conflict = bookings.some(b =>
-      b.date === "today" && !(endIdx <= b.startIdx || startIdx >= b.endIdx)
+    const conflict = bookingsForDate(selectedDate).some(b =>
+      !(endIdx <= b.startIdx || startIdx >= b.endIdx)
     );
     if (conflict) {
-      errEl.textContent = "This time slot overlaps with an existing booking. Please choose another time.";
+      errEl.textContent = "This slot overlaps with an existing booking. Please choose another time.";
       return;
     }
 
@@ -545,23 +810,27 @@
       purpose,
       startIdx,
       endIdx,
-      date: "today",
+      date: selectedDate,
       attendees: att,
       notes
     });
     selectedSlots = [];
+    saveBookings();
     closeModal();
+    buildStrip(); // refresh dots
     renderRoomStatus(); renderTimeline(); renderBookings();
-    showToast("Room booked successfully");
+    showToast(`Room booked for ${friendlyDate(selectedDate)}`);
   }
 
-  // ── Detail modal ─────────────────────────────────────────
+  // ── Detail modal ────────────────────────────────────────────
   function openDetail(id) {
     const b = bookings.find(x => x.id === id); if (!b) return;
     const mine = b.booker === ME;
     const dur  = durationLabel(b.startIdx, b.endIdx);
-    openModal(`<h3><i class="ti ti-info-circle" style="color:#1D9E75;font-size:18px;"></i>Booking details</h3>
+    openModal(`
+      <h3><i class="ti ti-info-circle" style="color:var(--green);font-size:18px;"></i>Booking details</h3>
       <div class="detail-row"><span class="detail-label">Room</span><span class="detail-value">Conference Room</span></div>
+      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${friendlyDate(b.date)}</span></div>
       <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">Ground Floor, Block B</span></div>
       <div class="detail-row"><span class="detail-label">Booked by</span><span class="detail-value">${b.booker}</span></div>
       <div class="detail-row"><span class="detail-label">Purpose</span><span class="detail-value">${b.purpose}</span></div>
@@ -573,15 +842,16 @@
       <div class="modal-actions">
         ${!mine
           ? `<button class="btn-cancel" onclick="closeModal();setTimeout(()=>openReschedule(${b.id}),50)"><i class="ti ti-refresh" style="font-size:13px;"></i> Request reschedule</button>`
-          : `<button class="btn-cancel" style="color:#993C1D;border-color:#F0997B;" onclick="cancelBooking(${b.id})"><i class="ti ti-trash" style="font-size:13px;"></i> Cancel</button>`}
+          : `<button class="btn-cancel" style="color:var(--red-darker);border-color:var(--red-mid);" onclick="cancelBooking(${b.id})"><i class="ti ti-trash" style="font-size:13px;"></i> Cancel</button>`}
         <button class="btn-confirm" onclick="closeModal()">Close</button>
       </div>`);
   }
 
-  // ── Reschedule modal ─────────────────────────────────────
+  // ── Reschedule modal ────────────────────────────────────────
   function openReschedule(id) {
     const b = bookings.find(x => x.id === id); if (!b) return;
-    openModal(`<h3><i class="ti ti-refresh" style="color:#1D9E75;font-size:18px;"></i>Request reschedule</h3>
+    openModal(`
+      <h3><i class="ti ti-refresh" style="color:var(--green);font-size:18px;"></i>Request reschedule</h3>
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:1rem;">
         Requesting a reschedule for <strong style="color:var(--text-primary);">${b.purpose}</strong> booked by ${b.booker}.
       </p>
@@ -609,26 +879,21 @@
     showToast("Reschedule request sent");
   }
 
-  // ── Cancel ───────────────────────────────────────────────
+  // ── Cancel ──────────────────────────────────────────────────
   function cancelBooking(id) {
     if (!confirm("Cancel this booking?")) return;
     bookings = bookings.filter(b => b.id !== id);
+    saveBookings();
     closeModal();
+    buildStrip();
     renderRoomStatus(); renderTimeline(); renderBookings();
     showToast("Booking cancelled");
   }
 
-  // ── Init ─────────────────────────────────────────────────
-  function initDate() {
-    const now    = new Date();
-    const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    document.getElementById("today-date").textContent =
-      `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-    document.getElementById("today-day").textContent = days[now.getDay()];
-  }
-
-  initDate();
+  // ── Init ────────────────────────────────────────────────────
+  updateTopbar();
+  buildStrip();
+  updateSectionLabels();
   renderRoomStatus();
   renderTimeline();
   renderBookings();
