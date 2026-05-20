@@ -1,902 +1,1142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sabarmati HSR Hub — Conference Room Booking</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>HSR Hub — Room Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --canvas:#F7F7F5;
+  --white:#FFFFFF;
+  --dark:#111111;
+  --dark2:#1C1C1C;
+  --teal:#1D9E75;
+  --teal-d:#0A5C45;
+  --teal-p:#E2F5ED;
+  --teal-m:#9FD9BF;
+  --amber:#F5C518;
+  --amber-p:#FEF7D4;
+  --amber-d:#8A6B00;
+  --red:#E03434;
+  --t1:#111111;
+  --t2:#555;
+  --t3:#999;
+  --b1:rgba(0,0,0,.06);
+  --b2:rgba(0,0,0,.11);
+  --r-pill:100px;
+  --r-card:20px;
+  --r-md:12px;
+  --r-sm:8px;
+  --f:'Inter',system-ui,sans-serif;
+  --sh:0 2px 12px rgba(0,0,0,.07);
+  --sh-d:0 6px 28px rgba(0,0,0,.2);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;height:100%}
+body{font-family:var(--f);background:var(--canvas);color:var(--t1);min-height:100vh;padding-bottom:env(safe-area-inset-bottom,24px)}
 
-    :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f5f5f3;
-      --bg-tertiary: #efefed;
-      --text-primary: #1a1a18;
-      --text-secondary: #6b6b67;
-      --text-tertiary: #9e9e9a;
-      --border-tertiary: rgba(0,0,0,0.09);
-      --border-secondary: rgba(0,0,0,0.16);
-      --green: #1D9E75;
-      --green-dark: #0F6E56;
-      --green-pale: #E1F5EE;
-      --green-mid: #9FE1CB;
-      --red-pale: #FAECE7;
-      --red-mid: #F0997B;
-      --red-dark: #712B13;
-      --red-darker: #993C1D;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-    }
+/* ═══ TOPBAR ═══ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--white);
+  height:60px;padding:0 1.25rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--b1);
+}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-logo{
+  width:34px;height:34px;border-radius:10px;
+  background:var(--dark);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.tb-logo i{font-size:17px;color:#fff}
+.tb-name{font-size:15px;font-weight:800;color:var(--dark);letter-spacing:-.03em}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-today{
+  display:flex;align-items:center;gap:6px;
+  background:var(--dark);color:var(--amber);
+  padding:6px 12px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:700;letter-spacing:.01em;white-space:nowrap;
+}
+.tb-today i{font-size:13px}
+.user-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--teal);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;cursor:pointer;
+  flex-shrink:0;border:2.5px solid transparent;
+  transition:border-color .15s;position:relative;
+}
+.user-btn:hover{border-color:var(--teal-m)}
+.user-btn-tip{
+  position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--dark);color:#fff;
+  font-size:11px;font-weight:600;
+  padding:5px 10px;border-radius:8px;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transform:translateY(-4px);
+  transition:opacity .15s,transform .15s;
+  z-index:10;
+}
+.user-btn:hover .user-btn-tip{opacity:1;transform:none}
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-primary: #1c1c1a;
-        --bg-secondary: #252523;
-        --bg-tertiary: #2e2e2b;
-        --text-primary: #f0efe8;
-        --text-secondary: #a0a09a;
-        --text-tertiary: #6a6a65;
-        --border-tertiary: rgba(255,255,255,0.07);
-        --border-secondary: rgba(255,255,255,0.14);
-        --green-pale: rgba(29,158,117,0.14);
-        --red-pale: rgba(240,153,123,0.12);
-      }
-    }
+/* ═══ TOAST ═══ */
+.toast-wrap{position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:500;pointer-events:none}
+.toast{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;
+  background:var(--dark);color:#fff;
+  border-radius:var(--r-pill);
+  font-size:13px;font-weight:600;
+  box-shadow:var(--sh-d);
+  opacity:0;transform:translateY(-8px) scale(.94);
+  transition:opacity .2s,transform .2s;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:none}
+.toast i{font-size:14px}
+.toast.t-ok i{color:var(--teal-m)}
+.toast.t-err i{color:#FF7878}
 
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      padding-bottom: 5rem;
-      -webkit-font-smoothing: antialiased;
-    }
+/* ═══ GATE ═══ */
+.gate{
+  position:fixed;inset:0;z-index:600;
+  background:var(--canvas);
+  display:flex;align-items:center;justify-content:center;
+  padding:1.5rem;
+}
+.gate-card{
+  background:var(--white);border-radius:var(--r-card);
+  padding:2.25rem 2rem;width:100%;max-width:390px;
+  box-shadow:var(--sh-d);
+  animation:popIn .32s cubic-bezier(.34,1.5,.64,1) both;
+}
+@keyframes popIn{from{opacity:0;transform:scale(.88) translateY(24px)}to{opacity:1;transform:none}}
+.gate-eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.gate-h{font-size:26px;font-weight:900;color:var(--dark);letter-spacing:-.03em;line-height:1.15;margin-bottom:6px}
+.gate-sub{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:1.5rem}
+.field{position:relative;margin-bottom:10px}
+.field i.fi{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--t3);pointer-events:none}
+.inp{
+  width:100%;padding:12px 13px 12px 38px;
+  font-size:15px;font-family:var(--f);font-weight:500;color:var(--t1);
+  background:var(--canvas);border:1.5px solid var(--b2);border-radius:var(--r-md);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.inp:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(29,158,117,.12)}
+.inp.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(224,52,52,.1)}
+.gate-hint{font-size:11px;color:var(--t3);margin-bottom:1.4rem}
+.gate-cta{
+  width:100%;padding:13px;
+  background:var(--dark);color:#fff;
+  font-size:15px;font-weight:800;font-family:var(--f);
+  border:none;border-radius:var(--r-md);cursor:pointer;
+  transition:opacity .15s,transform .1s;
+}
+.gate-cta:hover{opacity:.87}
+.gate-cta:active{transform:scale(.98)}
+.gate-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px}
 
-    .app { max-width: 680px; margin: 0 auto; background: var(--bg-tertiary); }
+/* ═══ PAGE ═══ */
+.page{padding:0 1.25rem}
 
-    /* ── Topbar ── */
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.9rem 1.25rem 0.8rem;
-      background: var(--bg-primary);
-      border-bottom: 0.5px solid var(--border-tertiary);
-      margin-bottom: 1.25rem;
-      position: sticky; top: 0; z-index: 20;
-    }
-    .topbar-logo { display: flex; align-items: center; gap: 10px; }
-    .logo-dot { width: 32px; height: 32px; border-radius: 8px; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .logo-dot i { font-size: 17px; color: #fff; }
-    .logo-text { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-    .logo-sub { font-size: 10px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 1px; }
+/* ═══ DATE STRIP ═══ */
+.ds{margin:1.1rem 0 1rem}
+.ds-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.ds-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--t3)}
+.ds-nav{display:flex;align-items:center;gap:5px}
+.ds-nav-btn{
+  width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--b2);background:var(--white);
+  color:var(--t2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  transition:all .12s;
+}
+.ds-nav-btn:hover:not(:disabled){background:var(--dark);color:#fff;border-color:var(--dark)}
+.ds-nav-btn:disabled{opacity:.2;cursor:default}
+.ds-month-lbl{font-size:12px;font-weight:700;color:var(--t1);min-width:110px;text-align:center}
 
-    /* Single-line date display — Apple style */
-    .topbar-date {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 13px; color: var(--text-secondary);
-    }
-    .topbar-date .date-main {
-      font-size: 13px; font-weight: 600; color: var(--text-primary);
-      letter-spacing: -0.01em;
-    }
-    .topbar-date .date-sep { opacity: 0.35; }
+.ds-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.ds-scroll::-webkit-scrollbar{display:none}
+.ds-row{display:flex;gap:4px;min-width:max-content}
 
-    /* ── Toast ── */
-    .toast-bar {
-      background: #085041; color: #E1F5EE; font-size: 13px;
-      padding: 10px 1.25rem; margin: 0 1.25rem 1rem;
-      border-radius: var(--radius-md);
-      display: none; align-items: center; gap: 8px;
-      animation: slideDown 0.2s ease;
-    }
-    .toast-bar.show { display: flex; }
-    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+.dp{
+  display:flex;flex-direction:column;align-items:center;
+  padding:8px 10px 6px;border-radius:13px;cursor:pointer;
+  min-width:48px;border:1.5px solid transparent;
+  transition:background .15s,border-color .15s,transform .09s;
+  user-select:none;
+}
+.dp:hover:not(.dp-p){background:rgba(0,0,0,.04)}
+.dp:active:not(.dp-p){transform:scale(.91)}
+.dp.dp-p{opacity:.28;cursor:default}
+.dp.dp-t{border-color:var(--teal)}
+.dp.dp-a{background:var(--dark);border-color:var(--dark);box-shadow:var(--sh-d)}
+.dp-dow{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.dp.dp-a .dp-dow{color:rgba(255,255,255,.5)}
+.dp.dp-t:not(.dp-a) .dp-dow{color:var(--teal)}
+.dp-num{font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.03em}
+.dp.dp-a .dp-num{color:#fff}
+.dp.dp-t:not(.dp-a) .dp-num{color:var(--teal)}
+.dp-dot{width:5px;height:5px;border-radius:50%;margin-top:4px;background:transparent;transition:background .2s}
+.dp.dp-has .dp-dot{background:var(--teal-m)}
+.dp.dp-a .dp-dot{background:var(--amber)}
 
-    /* ── Date strip ── */
-    .date-strip-wrap {
-      margin: 0 1.25rem 1.25rem;
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-tertiary);
-      border-radius: var(--radius-lg);
-      padding: 0.9rem 1rem 0.85rem;
-    }
-    .date-strip-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-    .date-strip-label {
-      font-size: 11px; font-weight: 600; color: var(--text-secondary);
-      text-transform: uppercase; letter-spacing: 0.07em;
-    }
-    .date-nav { display: flex; align-items: center; gap: 4px; }
-    .date-nav-btn {
-      width: 28px; height: 28px; border-radius: 6px; border: 0.5px solid var(--border-tertiary);
-      background: transparent; color: var(--text-secondary); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; font-size: 14px;
-      transition: background 0.12s;
-    }
-    .date-nav-btn:hover { background: var(--bg-secondary); }
-    .date-nav-btn:disabled { opacity: 0.3; cursor: default; }
-    .date-nav-label {
-      font-size: 12px; font-weight: 600; color: var(--text-primary);
-      padding: 0 6px; min-width: 80px; text-align: center;
-    }
+/* ═══ ROOM HERO ═══ */
+.room-hero{
+  background:var(--dark);border-radius:var(--r-card);
+  padding:1.15rem 1.35rem;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:1.15rem;
+  box-shadow:var(--sh-d);
+  position:relative;overflow:hidden;
+}
+.room-hero::after{
+  content:'';position:absolute;right:-30px;top:-30px;
+  width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(29,158,117,.18) 0%,transparent 70%);
+  pointer-events:none;
+}
+.rh-left{display:flex;align-items:center;gap:13px}
+.rh-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.rh-icon i{font-size:21px;color:rgba(255,255,255,.85)}
+.rh-name{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.rh-meta{font-size:11.5px;color:rgba(255,255,255,.42);margin-top:2px}
+.status-pill{
+  font-size:12px;font-weight:700;
+  padding:6px 13px;border-radius:var(--r-pill);
+  white-space:nowrap;flex-shrink:0;
+}
+.sp-free{background:rgba(29,158,117,.2);color:var(--teal-m)}
+.sp-busy{background:rgba(245,197,24,.17);color:var(--amber)}
 
-    .date-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .date-scroll::-webkit-scrollbar { display: none; }
-    .date-days { display: flex; gap: 6px; min-width: max-content; }
-    .day-pill {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 7px 10px; border-radius: 10px; cursor: pointer;
-      min-width: 46px; border: 0.5px solid transparent;
-      transition: background 0.12s, border-color 0.12s;
-      user-select: none;
-    }
-    .day-pill:hover { background: var(--bg-secondary); }
-    .day-pill.active {
-      background: var(--green); border-color: var(--green);
-    }
-    .day-pill.today-pill:not(.active) {
-      border-color: var(--green);
-    }
-    .day-pill-dow {
-      font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--text-tertiary); margin-bottom: 3px;
-    }
-    .day-pill.active .day-pill-dow { color: rgba(255,255,255,0.7); }
-    .day-pill-num {
-      font-size: 15px; font-weight: 700; color: var(--text-primary);
-      letter-spacing: -0.02em;
-    }
-    .day-pill.active .day-pill-num { color: #fff; }
-    .day-pill-dot {
-      width: 4px; height: 4px; border-radius: 50%; margin-top: 4px;
-      background: transparent;
-    }
-    .day-pill.has-bookings .day-pill-dot { background: var(--green-mid); }
-    .day-pill.active .day-pill-dot { background: rgba(255,255,255,0.5); }
+/* ═══ FREE HOURS BAR ═══ */
+.free-bar-wrap{margin-bottom:1.15rem}
+.free-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.free-bar-lbl{font-size:11px;font-weight:600;color:var(--t3)}
+.free-bar-val{font-size:12px;font-weight:700;color:var(--t1)}
+.free-bar-track{height:6px;background:var(--b1);border-radius:3px;overflow:hidden}
+.free-bar-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 
-    /* ── Room banner ── */
-    .room-banner {
-      margin: 0 1.25rem 1.25rem;
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-tertiary);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .room-banner-left { display: flex; align-items: center; gap: 12px; }
-    .room-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .room-icon i { font-size: 20px; color: var(--green-dark); }
-    .room-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
-    .room-meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5; }
-    .room-status-badge { font-size: 12px; padding: 5px 12px; border-radius: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
-    .badge-free { background: var(--green-pale); color: #085041; }
-    .badge-busy { background: var(--red-pale); color: var(--red-dark); }
+/* ═══ SECTION HEAD ═══ */
+.sec{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--t3)}
+.btn-new{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;
+  background:var(--dark);color:#fff;
+  font-size:13px;font-weight:700;font-family:var(--f);
+  border:none;border-radius:var(--r-pill);cursor:pointer;
+  box-shadow:var(--sh-d);
+  transition:opacity .15s,transform .09s;
+}
+.btn-new:hover{opacity:.84}
+.btn-new:active{transform:scale(.95)}
 
-    /* ── Section headers ── */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.25rem; margin-bottom: 0.75rem;
-    }
-    .section-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.07em; text-transform: uppercase; }
-    .btn-new {
-      font-size: 13px; padding: 6px 14px; cursor: pointer;
-      border: 0.5px solid var(--green); border-radius: var(--radius-md);
-      background: transparent; color: var(--green-dark);
-      display: inline-flex; align-items: center; gap: 5px;
-      transition: background 0.12s;
-    }
-    .btn-new:hover { background: var(--green-pale); }
+/* ═══ TIMELINE ═══ */
+.tl{margin-bottom:1.4rem}
+.tl-hint{font-size:11px;color:var(--t3);margin-bottom:7px;display:flex;align-items:center;gap:4px}
 
-    /* ── Timeline ── */
-    .timeline-wrap { padding: 0 1.25rem; margin-bottom: 1.5rem; }
-    .timeline-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+/* duration counter */
+.dur-counter{
+  display:none;align-items:center;gap:6px;
+  margin-bottom:7px;
+  background:var(--dark);color:var(--amber);
+  padding:7px 13px;border-radius:var(--r-pill);
+  font-size:13px;font-weight:700;
+  width:fit-content;
+  animation:slideIn .18s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.dur-counter.show{display:inline-flex}
+.dur-counter i{font-size:14px}
 
-    .timeline-scroll-wrap { overflow-x: auto; border-radius: var(--radius-md); }
-    .timeline-scroll-wrap::-webkit-scrollbar { height: 4px; }
-    .timeline-scroll-wrap::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    .timeline-scroll-wrap::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 2px; }
+.tl-card{
+  background:var(--white);border-radius:var(--r-card);
+  padding:10px;overflow-x:auto;box-shadow:var(--sh);
+  position:relative;
+}
+.tl-card::-webkit-scrollbar{height:3px}
+.tl-card::-webkit-scrollbar-thumb{background:var(--teal-m);border-radius:2px}
 
-    .timeline-grid {
-      display: grid;
-      gap: 2px;
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      padding: 6px;
-      min-width: max-content;
-    }
+/* now marker */
+.now-line{
+  position:absolute;top:10px;bottom:10px;width:2px;
+  background:var(--red);border-radius:1px;
+  pointer-events:none;z-index:5;
+}
+.now-dot{
+  position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);
+}
 
-    /* ── Apple-style single-line slot ── */
-    .tslot {
-      height: 34px; width: 58px; border-radius: 5px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.1s, transform 0.08s;
-      user-select: none;
-      font-size: 11px; font-weight: 500; letter-spacing: -0.01em;
-      white-space: nowrap;
-    }
-    .tslot:active { transform: scale(0.94); }
-    .tslot.free     { background: var(--green-pale); color: var(--green-dark); }
-    .tslot.free:hover { background: var(--green-mid); }
-    .tslot.booked   { background: var(--red-pale); color: var(--red-darker); cursor: default; }
-    .tslot.selected { background: var(--green); color: #fff; }
-    .tslot.past     { background: var(--bg-tertiary); color: var(--text-tertiary); cursor: default; opacity: 0.6; }
+.tl-grid{display:grid;gap:3px;min-width:max-content;position:relative}
 
-    .tslot-book-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-    .legend { display: flex; gap: 14px; flex-wrap: wrap; }
-    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
-    .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
-    .btn-sm {
-      font-size: 12px; color: var(--green-dark); border: 0.5px solid var(--green-dark);
-      background: transparent; border-radius: var(--radius-md);
-      padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
-      transition: background 0.12s;
-    }
-    .btn-sm:hover { background: var(--green-pale); }
+.tslot{
+  height:36px;width:60px;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;white-space:nowrap;
+  user-select:none;
+  transition:background .1s,transform .08s,box-shadow .1s;
+  position:relative;
+}
+.tslot:active:not(.ts-past):not(.ts-other){transform:scale(.88)}
+.ts-free{background:#EFEFEF;color:#777}
+.ts-free:hover{background:var(--teal-p);color:var(--teal-d)}
+.ts-sel{background:var(--dark);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.ts-mine{background:var(--amber-p);color:var(--amber-d);border:1px solid rgba(245,197,24,.3)}
+.ts-other{background:#F2F2F2;color:#C0C0C0;cursor:default}
+.ts-past{background:#F2F2F2;color:#D0D0D0;cursor:default;opacity:.5}
 
-    /* ── Filter tabs ── */
-    .filter-tabs { display: flex; gap: 4px; padding: 0 1.25rem; margin-bottom: 1rem; }
-    .ftab { font-size: 12px; padding: 5px 13px; border-radius: 16px; cursor: pointer; border: 0.5px solid var(--border-tertiary); background: transparent; color: var(--text-secondary); transition: background 0.12s; }
-    .ftab.active { background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border-secondary); font-weight: 500; }
+.tl-foot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;flex-wrap:wrap;gap:6px}
+.legend{display:flex;gap:9px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--t3)}
+.leg-sq{width:10px;height:10px;border-radius:3px}
+.btn-bk-sel{
+  display:none;align-items:center;gap:5px;
+  padding:6px 13px;
+  background:var(--teal);color:#fff;
+  border:none;border-radius:var(--r-pill);
+  font-size:12px;font-weight:700;font-family:var(--f);cursor:pointer;
+  transition:opacity .15s,transform .09s;
+  animation:popIn .18s ease;
+}
+.btn-bk-sel:hover{opacity:.85}
+.btn-bk-sel:active{transform:scale(.95)}
+.btn-bk-sel.show{display:inline-flex}
 
-    /* ── Booking cards ── */
-    .bookings-list { padding: 0 1.25rem; display: flex; flex-direction: column; gap: 10px; }
-    .booking-card {
-      background: var(--bg-primary); border: 0.5px solid var(--border-tertiary);
-      border-radius: var(--radius-lg); padding: 1rem 1.25rem;
-      cursor: pointer; transition: border-color 0.15s;
-    }
-    .booking-card:hover { border-color: var(--border-secondary); }
-    .booking-card.mine  { border-left: 3px solid var(--green); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
-    .booking-card.other { border-left: 3px solid var(--red-mid); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
-    .bc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
-    .bc-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-    .bc-meta-row { display: flex; align-items: center; gap: 10px; margin-top: 3px; flex-wrap: wrap; }
-    .bc-time  { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
-    .bc-date-tag {
-      font-size: 11px; padding: 2px 7px; border-radius: 8px;
-      background: var(--bg-secondary); color: var(--text-tertiary); font-weight: 500;
-    }
-    .bc-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
-    .badge-mine  { background: var(--green-pale); color: #085041; }
-    .badge-other { background: var(--red-pale); color: var(--red-dark); }
-    .bc-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-    .bc-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--green-pale); color: #085041; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
-    .bc-avatar.other { background: var(--red-pale); color: var(--red-dark); }
-    .bc-name { font-size: 13px; color: var(--text-secondary); }
-    .bc-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .bc-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--radius-md); cursor: pointer; border: 0.5px solid var(--border-secondary); background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px; transition: background 0.12s; }
-    .bc-btn:hover { background: var(--bg-secondary); }
-    .bc-btn.primary { color: var(--green-dark); border-color: #5DCAA5; }
-    .bc-btn.primary:hover { background: var(--green-pale); }
-    .bc-btn.danger  { color: var(--red-darker); border-color: var(--red-mid); }
-    .bc-btn.danger:hover { background: var(--red-pale); }
+/* ═══ FILTERS ═══ */
+.frow{display:flex;gap:4px;margin-bottom:.85rem;flex-wrap:wrap}
+.ftab{
+  font-size:12px;font-weight:600;font-family:var(--f);
+  padding:6px 14px;border-radius:var(--r-pill);
+  border:1.5px solid var(--b2);background:var(--white);
+  color:var(--t3);cursor:pointer;transition:all .15s;
+}
+.ftab:hover{color:var(--t1);border-color:var(--t1)}
+.ftab.on{background:var(--dark);color:#fff;border-color:var(--dark)}
 
-    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); font-size: 14px; }
-    .empty-state i { font-size: 36px; display: block; margin-bottom: 10px; color: var(--text-tertiary); }
-    .empty-state p { margin-top: 4px; font-size: 13px; color: var(--text-tertiary); }
+/* ═══ BOOKING CARDS ═══ */
+.bk-list{display:flex;flex-direction:column;gap:7px}
+.bk-card{
+  background:var(--white);border-radius:var(--r-card);
+  overflow:hidden;cursor:pointer;
+  box-shadow:var(--sh);border:1px solid transparent;
+  transition:box-shadow .18s,border-color .18s,transform .11s;
+  animation:fadeUp .3s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.bk-card:hover{box-shadow:0 6px 22px rgba(0,0,0,.11);border-color:var(--b2)}
+.bk-card:active{transform:scale(.994)}
+.bk-inner{padding:.95rem 1.15rem;position:relative}
+.bk-card.is-mine .bk-inner::before{
+  content:'';position:absolute;left:0;top:0;right:0;height:3px;
+  background:var(--teal);border-radius:3px 3px 0 0;
+}
+.bk-card.is-other .bk-inner::before{
+  content:'';position:absolute;left:0;top:0;right:0;height:3px;
+  background:#DDD;border-radius:3px 3px 0 0;
+}
+.bk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.bk-title{font-size:14px;font-weight:800;color:var(--t1);letter-spacing:-.02em}
+.bk-time{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:3px;flex-wrap:wrap;margin-top:2px}
+.bk-dtag{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:var(--r-pill);
+  background:var(--dark);color:#fff;margin-left:4px;
+}
+.bk-badge{
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-pill);
+  white-space:nowrap;flex-shrink:0;
+}
+.b-mine{background:var(--teal-p);color:var(--teal-d)}
+.b-other{background:#F0F0F0;color:#777}
+.bk-bot{display:flex;align-items:center;gap:7px;margin-top:8px}
+.bk-av{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;flex-shrink:0;
+}
+.av-m{background:var(--teal-p);color:var(--teal-d)}
+.av-o{background:#EEE;color:#777}
+.bk-who{font-size:13px;font-weight:600;color:var(--t2)}
+.bk-pax{font-size:11px;color:var(--t3);margin-left:auto;display:flex;align-items:center;gap:3px}
+.bk-acts{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+.bc-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:600;font-family:var(--f);
+  padding:5px 12px;border-radius:var(--r-pill);cursor:pointer;
+  border:1.5px solid var(--b2);background:transparent;color:var(--t2);
+  transition:background .12s,border-color .12s;
+}
+.bc-btn:hover{background:#F5F5F5}
+.bc-btn.bc-teal{color:var(--teal-d);border-color:var(--teal-m);background:var(--teal-p)}
+.bc-btn.bc-teal:hover{background:var(--teal-m)}
+.bc-btn.bc-red{color:var(--red);border-color:rgba(224,52,52,.3);background:rgba(224,52,52,.06)}
+.bc-btn.bc-red:hover{background:rgba(224,52,52,.12)}
 
-    /* ── Modal ── */
-    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.38); align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(2px); }
-    .modal-overlay.open { display: flex; }
-    .modal { background: var(--bg-primary); border-radius: 16px; border: 0.5px solid var(--border-tertiary); width: 100%; max-width: 440px; padding: 1.5rem; max-height: 92vh; overflow-y: auto; animation: modalIn 0.18s ease; }
-    @keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:none; } }
-    .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-    .modal label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px; margin-top: 14px; }
-    .modal input, .modal select, .modal textarea {
-      width: 100%; font-size: 14px; color: var(--text-primary);
-      border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md);
-      background: var(--bg-secondary); padding: 8px 10px; font-family: var(--font-sans); outline: none;
-    }
-    .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2.5px rgba(29,158,117,0.12); }
-    .modal textarea { min-height: 70px; resize: vertical; }
-    .modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; justify-content: flex-end; }
-    .btn-cancel { font-size: 13px; padding: 8px 16px; cursor: pointer; border: 0.5px solid var(--border-secondary); border-radius: var(--radius-md); background: transparent; color: var(--text-secondary); transition: background 0.12s; }
-    .btn-cancel:hover { background: var(--bg-secondary); }
-    .btn-confirm { font-size: 13px; padding: 8px 18px; cursor: pointer; border: none; border-radius: var(--radius-md); background: var(--green); color: #fff; font-weight: 600; transition: background 0.12s; }
-    .btn-confirm:hover { background: var(--green-dark); }
+/* ═══ EMPTY ═══ */
+.empty{text-align:center;padding:3.5rem 1rem}
+.empty-icon{
+  width:60px;height:60px;border-radius:16px;background:var(--dark);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;
+}
+.empty-icon i{font-size:28px;color:rgba(255,255,255,.35)}
+.empty-h{font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.02em;margin-bottom:5px}
+.empty-p{font-size:13px;color:var(--t3);line-height:1.5}
 
-    .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 0.5px solid var(--border-tertiary); font-size: 13px; }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-label { color: var(--text-secondary); flex-shrink: 0; }
-    .detail-value { color: var(--text-primary); font-weight: 500; text-align: right; max-width: 65%; }
+/* ═══ MODAL OVERLAY ═══ */
+.modal-ov{
+  display:none;position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,.45);
+  align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.modal-ov.open{display:flex}
+.modal-sheet{
+  background:var(--white);
+  border-radius:24px 24px 0 0;
+  width:100%;max-width:700px;
+  max-height:90vh;overflow-y:auto;
+  animation:sheetUp .26s cubic-bezier(.32,.72,0,1) both;
+  border-top:1px solid var(--b1);
+  padding-bottom:env(safe-area-inset-bottom,16px);
+}
+@keyframes sheetUp{from{transform:translateY(110%)}to{transform:none}}
+@keyframes sheetDn{from{transform:none}to{transform:translateY(110%)}}
+.modal-handle{width:38px;height:4px;border-radius:2px;background:#DDD;margin:10px auto 5px}
+.modal-body{padding:.9rem 1.4rem 1.6rem}
 
-    .error-outline { outline: 1.5px solid #D85A30 !important; }
-    .field-error { font-size: 11px; color: #D85A30; margin-top: 3px; }
+/* modal header */
+.m-hd{display:flex;align-items:center;gap:11px;margin-bottom:1.1rem}
+.m-hd-icon{
+  width:38px;height:38px;border-radius:11px;
+  background:var(--dark);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.m-hd-icon i{font-size:19px;color:#fff}
+.m-hd-title{font-size:19px;font-weight:900;color:var(--t1);letter-spacing:-.03em}
+.m-hd-sub{font-size:12px;color:var(--t3);margin-top:1px}
 
-    @media (max-width: 500px) {
-      .topbar { padding: 0.75rem 1rem; }
-      .room-banner, .toast-bar, .date-strip-wrap { margin-left: 1rem; margin-right: 1rem; }
-      .section-header, .timeline-wrap, .bookings-list, .filter-tabs { padding-left: 1rem; padding-right: 1rem; }
-      .logo-text { font-size: 13px; }
-    }
-  </style>
+/* date chip in modal */
+.m-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--dark);color:var(--amber);
+  padding:7px 14px;border-radius:var(--r-pill);
+  font-size:12px;font-weight:700;margin-bottom:1.1rem;
+}
+.m-chip i{font-size:13px}
+
+/* form */
+.modal-body label{
+  display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--t3);margin:13px 0 5px;
+}
+.modal-body input,.modal-body select,.modal-body textarea{
+  width:100%;font-size:14px;font-weight:500;font-family:var(--f);
+  color:var(--t1);background:var(--canvas);
+  border:1.5px solid var(--b2);border-radius:var(--r-md);
+  padding:10px 12px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.modal-body input[readonly]{opacity:.55;cursor:default;pointer-events:none}
+.modal-body input:focus,.modal-body select:focus,.modal-body textarea:focus{
+  border-color:var(--teal);box-shadow:0 0 0 3px rgba(29,158,117,.1);
+}
+.modal-body textarea{min-height:70px;resize:vertical}
+.f-err-txt{font-size:11.5px;color:var(--red);margin-top:5px;min-height:14px}
+.err-ol{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(224,52,52,.09)!important}
+
+/* time picker row */
+.time-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* modal actions */
+.m-acts{display:flex;gap:7px;margin-top:1.35rem;justify-content:flex-end;flex-wrap:wrap}
+.m-sec{
+  font-size:14px;font-weight:600;font-family:var(--f);
+  padding:10px 18px;border:1.5px solid var(--b2);border-radius:var(--r-pill);
+  background:transparent;color:var(--t2);cursor:pointer;
+  transition:background .12s;
+}
+.m-sec:hover{background:#F5F5F5}
+.m-pri{
+  font-size:14px;font-weight:800;font-family:var(--f);
+  padding:10px 22px;border:none;border-radius:var(--r-pill);
+  background:var(--dark);color:#fff;cursor:pointer;
+  box-shadow:var(--sh-d);transition:opacity .15s,transform .09s;
+}
+.m-pri:hover{opacity:.85}
+.m-pri:active{transform:scale(.97)}
+.m-red{
+  font-size:14px;font-weight:700;font-family:var(--f);
+  padding:10px 18px;border:1.5px solid rgba(224,52,52,.35);border-radius:var(--r-pill);
+  background:rgba(224,52,52,.07);color:var(--red);cursor:pointer;
+  transition:background .12s;
+}
+.m-red:hover{background:rgba(224,52,52,.13)}
+
+/* detail rows */
+.det-grp{border:1.5px solid var(--b1);border-radius:var(--r-md);overflow:hidden;margin-bottom:.9rem}
+.det-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 13px;font-size:13px;border-bottom:1px solid var(--b1)}
+.det-row:last-child{border-bottom:none}
+.det-lbl{color:var(--t3);font-weight:500;flex-shrink:0}
+.det-val{color:var(--t1);font-weight:700;text-align:right;max-width:62%;word-break:break-word}
+
+/* lock notice */
+.lock-note{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 13px;background:#F5F5F5;border-radius:var(--r-md);
+  font-size:12px;color:var(--t3);margin-bottom:.9rem;
+}
+.lock-note i{flex-shrink:0;font-size:14px}
+
+/* inline delete confirm */
+.del-confirm{
+  background:rgba(224,52,52,.07);border:1.5px solid rgba(224,52,52,.25);
+  border-radius:var(--r-md);padding:13px 14px;margin-bottom:1rem;
+}
+.del-confirm p{font-size:13px;color:#7A1A1A;line-height:1.5;margin-bottom:.9rem}
+.del-confirm-acts{display:flex;gap:7px;justify-content:flex-end}
+
+/* ── detail section ── */
+.m-sec-alt{
+  font-size:14px;font-weight:600;font-family:var(--f);
+  padding:10px 18px;border:1.5px solid var(--b2);border-radius:var(--r-pill);
+  background:transparent;color:var(--t2);cursor:pointer;
+  transition:background .12s;
+}
+.m-sec-alt:hover{background:#F5F5F5}
+
+@media(min-width:520px){
+  .modal-ov{align-items:center;padding:1.5rem}
+  .modal-sheet{border-radius:24px;max-width:460px;animation:mPop .22s cubic-bezier(.34,1.2,.64,1) both}
+  @keyframes mPop{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:none}}
+}
+@media(max-width:460px){
+  .topbar{padding:0 1rem}
+  .page{padding:0 1rem}
+  .tb-today{display:none} /* hide on very small */
+}
+</style>
 </head>
 <body>
 
-<div class="app">
-
-  <div class="topbar">
-    <div class="topbar-logo">
-      <div class="logo-dot"><i class="ti ti-building"></i></div>
-      <div>
-        <div class="logo-text">Sabarmati HSR Hub</div>
-        <div class="logo-sub">Room Booking</div>
-      </div>
+<!-- GATE -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-eyebrow">Sabarmati HSR Hub</div>
+    <div class="gate-h">Who are you?</div>
+    <div class="gate-sub">Your name stays tied to your bookings. Only you can cancel what you create.</div>
+    <div class="field">
+      <i class="ti ti-user fi"></i>
+      <input class="inp" id="gate-inp" type="text" placeholder="Your full name" autocomplete="name"/>
     </div>
-    <div class="topbar-date">
-      <span class="date-main" id="topbar-date-str"></span>
-      <span class="date-sep">·</span>
-      <span id="topbar-day-str" style="font-size:12px;"></span>
-    </div>
+    <div class="gate-hint">Visible to everyone in the team.</div>
+    <button class="gate-cta" onclick="submitGate()">Get started →</button>
+    <div class="gate-err" id="gate-err"></div>
   </div>
-
-  <div class="toast-bar" id="toast-bar">
-    <i class="ti ti-circle-check" style="font-size:16px;"></i>
-    <span id="toast-msg"></span>
-  </div>
-
-  <!-- Date strip -->
-  <div class="date-strip-wrap">
-    <div class="date-strip-header">
-      <span class="date-strip-label" id="strip-month-label"></span>
-      <div class="date-nav">
-        <button class="date-nav-btn" id="nav-prev" onclick="shiftWeek(-1)"><i class="ti ti-chevron-left"></i></button>
-        <span class="date-nav-label" id="nav-range-label"></span>
-        <button class="date-nav-btn" id="nav-next" onclick="shiftWeek(1)"><i class="ti ti-chevron-right"></i></button>
-      </div>
-    </div>
-    <div class="date-scroll">
-      <div class="date-days" id="date-days"></div>
-    </div>
-  </div>
-
-  <!-- Room banner -->
-  <div class="room-banner">
-    <div class="room-banner-left">
-      <div class="room-icon"><i class="ti ti-layout-board"></i></div>
-      <div>
-        <div class="room-name">Conference Room</div>
-        <div class="room-meta">Capacity: 10 &nbsp;·&nbsp; Ground Floor, Block B</div>
-      </div>
-    </div>
-    <span class="room-status-badge" id="room-status-badge"></span>
-  </div>
-
-  <!-- Timeline section -->
-  <div class="section-header">
-    <span class="section-title" id="avail-section-title">Availability</span>
-    <button class="btn-new" onclick="openBookModal()">
-      <i class="ti ti-plus" style="font-size:13px;"></i> New booking
-    </button>
-  </div>
-
-  <div class="timeline-wrap">
-    <div class="timeline-label" id="timeline-label">Tap free slots to select, then book &nbsp;·&nbsp; 15-min intervals (9:00 AM – 6:00 PM)</div>
-    <div class="timeline-scroll-wrap">
-      <div class="timeline-grid" id="timeline-grid"></div>
-    </div>
-    <div class="tslot-book-row">
-      <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--green-pale);border:1px solid var(--green-mid);"></div>Free</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Selected</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--red-pale);border:1px solid var(--red-mid);"></div>Booked</div>
-      </div>
-      <button class="btn-sm" id="book-sel-btn" style="display:none;" onclick="openBookModal()">
-        <i class="ti ti-plus" style="font-size:13px;"></i> Book selected
-      </button>
-    </div>
-  </div>
-
-  <!-- Bookings -->
-  <div class="section-header">
-    <span class="section-title">Bookings</span>
-    <span id="booking-count" style="font-size:12px;color:var(--text-secondary);"></span>
-  </div>
-
-  <div class="filter-tabs">
-    <button class="ftab active" onclick="setFilter('all',this)">All</button>
-    <button class="ftab" onclick="setFilter('mine',this)">Mine</button>
-    <button class="ftab" onclick="setFilter('selected',this)">This day</button>
-  </div>
-
-  <div class="bookings-list" id="bookings-list"></div>
 </div>
 
-<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal" id="modal-inner"></div>
+<div id="app" style="display:none">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-brand">
+    <div class="tb-logo"><i class="ti ti-building-monument"></i></div>
+    <span class="tb-name">HSR Hub</span>
+  </div>
+  <div class="tb-right">
+    <div class="tb-today"><i class="ti ti-calendar-filled"></i><span id="tb-dt"></span></div>
+    <div class="user-btn" id="user-btn" onclick="openUserMenu()" title="">
+      <span id="user-av"></span>
+      <div class="user-btn-tip" id="user-tip"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap"><div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toast-msg"></span></div></div>
+
+<div class="page">
+
+  <!-- DATE STRIP -->
+  <div class="ds">
+    <div class="ds-top">
+      <span class="ds-lbl">Viewing</span>
+      <div class="ds-nav">
+        <button class="ds-nav-btn" id="np" onclick="shift(-1)"><i class="ti ti-chevron-left"></i></button>
+        <span class="ds-month-lbl" id="ds-month"></span>
+        <button class="ds-nav-btn" id="nn" onclick="shift(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+    <div class="ds-scroll"><div class="ds-row" id="ds-row"></div></div>
+  </div>
+
+  <!-- ROOM HERO -->
+  <div class="room-hero">
+    <div class="rh-left">
+      <div class="rh-icon"><i class="ti ti-layout-board"></i></div>
+      <div>
+        <div class="rh-name">Conference Room</div>
+        <div class="rh-meta">Cap. 10 · Ground Floor, Block B</div>
+      </div>
+    </div>
+    <div class="status-pill" id="sp"></div>
+  </div>
+
+  <!-- FREE HOURS BAR (today only) -->
+  <div class="free-bar-wrap" id="free-bar-wrap">
+    <div class="free-bar-top">
+      <span class="free-bar-lbl">Free time remaining today</span>
+      <span class="free-bar-val" id="free-bar-val"></span>
+    </div>
+    <div class="free-bar-track"><div class="free-bar-fill" id="free-bar-fill"></div></div>
+  </div>
+
+  <!-- AVAILABILITY -->
+  <div class="sec">
+    <span class="sec-lbl" id="avail-lbl">Availability</span>
+    <button class="btn-new" onclick="openBook()"><i class="ti ti-plus" style="font-size:13px"></i>Book room</button>
+  </div>
+
+  <div class="tl">
+    <div class="tl-hint"><i class="ti ti-hand-click" style="font-size:12px"></i>Tap slots to select · 15 min · 9 AM–6 PM</div>
+    <div class="dur-counter" id="dur-counter"><i class="ti ti-clock"></i><span id="dur-txt"></span></div>
+    <div class="tl-card" id="tl-card">
+      <div class="tl-grid" id="tl-grid"></div>
+    </div>
+    <div class="tl-foot">
+      <div class="legend">
+        <div class="leg"><div class="leg-sq" style="background:#EFEFEF;border:1px solid #DDD"></div>Free</div>
+        <div class="leg"><div class="leg-sq" style="background:var(--dark)"></div>Selected</div>
+        <div class="leg"><div class="leg-sq" style="background:var(--amber-p);border:1px solid rgba(245,197,24,.4)"></div>Mine</div>
+        <div class="leg"><div class="leg-sq" style="background:#F0F0F0;border:1px solid #E5E5E5"></div>Other</div>
+      </div>
+      <button class="btn-bk-sel" id="bk-sel" onclick="openBook()"><i class="ti ti-plus" style="font-size:12px"></i><span id="bk-sel-txt">Book</span></button>
+    </div>
+  </div>
+
+  <!-- BOOKINGS -->
+  <div class="sec">
+    <span class="sec-lbl">Bookings</span>
+    <span id="bk-ct" style="font-size:12px;color:var(--t3);font-weight:600"></span>
+  </div>
+
+  <div class="frow">
+    <button class="ftab on" onclick="setF('all',this)">All</button>
+    <button class="ftab" onclick="setF('mine',this)">Mine</button>
+    <button class="ftab" onclick="setF('day',this)" id="ftab-day">Selected day</button>
+  </div>
+
+  <div class="bk-list" id="bk-list"></div>
+</div><!-- /page -->
+</div><!-- /app -->
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal-ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-body" id="mb"></div>
+  </div>
 </div>
 
 <script>
-  // ── Config ─────────────────────────────────────────────────
-  const ME = "You", MI = "YO";
-  const STORAGE_KEY = "hsrhub_bookings_v2";
-  const DAY_START = 9, DAY_END = 18;
-  const DAYS_LABEL = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const MONTHS_LABEL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+// ── Config ─────────────────────────────────────────────────────
+const SKB='hsrhub_v5_bk', SKU='hsrhub_v5_u';
+const H0=9, HE=18;
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONF=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-  // Build 15-min slots
-  const SLOTS = [];
-  for (let h = DAY_START; h < DAY_END; h++) {
-    for (let m = 0; m < 60; m += 15) {
-      const ampm = h >= 12 ? "PM" : "AM";
-      const h12  = h > 12 ? h - 12 : (h === 0 ? 12 : h);
-      const mm   = String(m).padStart(2, "0");
-      SLOTS.push({
-        index: SLOTS.length,
-        hour: h, min: m,
-        label: `${h12}:${mm} ${ampm}`,
-        // Single-line compact: "9:00" / "12:30"
-        compact: `${h12}:${mm}`
-      });
+const SLOTS=[];
+for(let h=H0;h<HE;h++) for(let m=0;m<60;m+=15){
+  const ap=h>=12?'PM':'AM',h12=h>12?h-12:h,mm=String(m).padStart(2,'0');
+  SLOTS.push({i:SLOTS.length,h,m,label:`${h12}:${mm} ${ap}`,c:`${h12}:${mm}`});
+}
+const TOTAL=SLOTS.length;
+
+// ── Date utils ─────────────────────────────────────────────────
+const dk=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const today=()=>dk(new Date());
+const k2d=k=>{const[y,mo,d]=k.split('-').map(Number);return new Date(y,mo-1,d)};
+const slbl=i=>i>=0&&i<TOTAL?SLOTS[i].label:'—';
+const sidx=(h,m)=>SLOTS.findIndex(s=>s.h===h&&s.m===m);
+const dur=(s,e)=>{const m=(e-s)*15;if(m<60)return`${m} min`;const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`};
+const inits=n=>n.trim().split(/\s+/).map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('')||'?';
+
+function friendly(dk){
+  const tk=today(),tm=new Date();tm.setDate(tm.getDate()+1);
+  const tmk=dk_(tm);
+  if(dk===tk)return'Today';
+  if(dk===tmk)return'Tomorrow';
+  const d=k2d(dk);return`${DOW[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
+}
+function dk_(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+// ── State ──────────────────────────────────────────────────────
+let cu=null,bookings=[],nextId=1,selDate=today(),selSlots=[],wOff=0,filt='all';
+
+// ── Persist ────────────────────────────────────────────────────
+function lu(){try{return JSON.parse(localStorage.getItem(SKU))||null}catch{return null}}
+function su(u){try{localStorage.setItem(SKU,JSON.stringify(u))}catch{}}
+function lb(){try{const r=localStorage.getItem(SKB);if(r){bookings=JSON.parse(r);nextId=bookings.length?Math.max(...bookings.map(b=>b.id))+1:1}}catch{bookings=[]}}
+function sb(){try{localStorage.setItem(SKB,JSON.stringify(bookings))}catch{}}
+
+// ── Gate ───────────────────────────────────────────────────────
+function submitGate(){
+  const n=document.getElementById('gate-inp').value.trim();
+  const er=document.getElementById('gate-err');
+  if(!n||n.length<2){
+    document.getElementById('gate-inp').classList.add('err');
+    er.textContent='Enter your full name (at least 2 chars).';return;
+  }
+  cu={name:n,inits:inits(n)};su(cu);
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  setupUI();init();
+}
+document.getElementById('gate-inp').addEventListener('keydown',e=>{
+  if(e.key==='Enter')submitGate();
+  document.getElementById('gate-inp').classList.remove('err');
+  document.getElementById('gate-err').textContent='';
+});
+
+// User menu — no browser confirm, uses modal instead
+function openUserMenu(){
+  openModal(`
+    <div class="m-hd">
+      <div class="m-hd-icon"><i class="ti ti-user"></i></div>
+      <div><div class="m-hd-title">${escHtml(cu.name)}</div><div class="m-hd-sub">Signed in</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:1.25rem">You're currently signed in as <strong>${escHtml(cu.name)}</strong>. Switching will clear your session — your bookings stay saved.</p>
+    <div class="m-acts">
+      <button class="m-sec" onclick="closeModal()">Stay signed in</button>
+      <button class="m-red" onclick="doSwitch()">Switch user</button>
+    </div>`);
+}
+function doSwitch(){
+  cu=null;try{localStorage.removeItem(SKU)}catch{}
+  closeModal();
+  setTimeout(()=>{
+    document.getElementById('app').style.display='none';
+    document.getElementById('gate').style.display='flex';
+    document.getElementById('gate-inp').value='';
+    document.getElementById('gate-err').textContent='';
+  },240);
+}
+
+function setupUI(){
+  document.getElementById('user-av').textContent=cu.inits;
+  document.getElementById('user-tip').textContent=cu.name;
+  const d=new Date();
+  document.getElementById('tb-dt').textContent=`${d.getDate()} ${MON[d.getMonth()]} · ${DOW[d.getDay()]}`;
+}
+
+// ── Date strip ─────────────────────────────────────────────────
+function buildStrip(){
+  const t=new Date();t.setHours(0,0,0,0);
+  const st=new Date(t);st.setDate(t.getDate()+wOff*7);
+  const days=Array.from({length:14},(_,i)=>{const d=new Date(st);d.setDate(st.getDate()+i);return d});
+  const f=days[0],l=days[13];
+  document.getElementById('ds-month').textContent=
+    f.getMonth()===l.getMonth()?`${MONF[f.getMonth()]} ${f.getFullYear()}`:`${MON[f.getMonth()]}–${MON[l.getMonth()]}`;
+  document.getElementById('np').disabled=wOff<=0;
+  const row=document.getElementById('ds-row');row.innerHTML='';
+  days.forEach(d=>{
+    const dkd=dk(d),isT=dkd===today(),isA=dkd===selDate,isP=dkd<today();
+    const hasB=bookings.some(b=>b.date===dkd);
+    const pill=document.createElement('div');
+    pill.className='dp'+(isA?' dp-a':'')+(isT&&!isA?' dp-t':'')+(isP?' dp-p':'')+(hasB?' dp-has':'');
+    pill.innerHTML=`<div class="dp-dow">${DOW[d.getDay()]}</div><div class="dp-num">${d.getDate()}</div><div class="dp-dot"></div>`;
+    if(!isP)pill.onclick=()=>pickDate(dkd);
+    row.appendChild(pill);
+    if(isA)setTimeout(()=>pill.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'}),60);
+  });
+}
+function shift(d){if(d<0&&wOff<=0)return;wOff+=d;buildStrip()}
+
+function pickDate(d){
+  selDate=d;selSlots=[];
+  buildStrip();renderStatus();renderFreeBar();renderTimeline();renderBookings();updateAvailLbl();
+  // update "Selected day" tab label
+  document.getElementById('ftab-day').textContent=friendly(d)==='Today'?'Today':friendly(d);
+}
+
+function updateAvailLbl(){
+  const l=friendly(selDate);
+  document.getElementById('avail-lbl').textContent=l==='Today'?"Today's availability":`Availability — ${l}`;
+}
+
+// ── Room status ────────────────────────────────────────────────
+function renderStatus(){
+  const el=document.getElementById('sp');
+  if(selDate!==today()){
+    const n=bookings.filter(b=>b.date===selDate).length;
+    el.textContent=n?`${n} booking${n>1?'s':''}`:'Open all day';
+    el.className='status-pill '+(n?'sp-busy':'sp-free');return;
+  }
+  const now=new Date(),ri=sidx(now.getHours(),Math.floor(now.getMinutes()/15)*15);
+  const busy=ri>=0&&bookings.some(b=>b.date===today()&&ri>=b.startIdx&&ri<b.endIdx);
+  el.textContent=busy?'In use now':'Available now';
+  el.className='status-pill '+(busy?'sp-busy':'sp-free');
+}
+
+// ── Free hours bar ─────────────────────────────────────────────
+function renderFreeBar(){
+  const wrap=document.getElementById('free-bar-wrap');
+  if(selDate!==today()){wrap.style.display='none';return}
+  wrap.style.display='block';
+  const now=new Date();
+  const curH=now.getHours(),curM=now.getMinutes();
+  // count free slots from now
+  let totalRemaining=0,freeRemaining=0;
+  SLOTS.forEach((s,i)=>{
+    const slotEnd=new Date();slotEnd.setHours(s.h,s.m+15,0,0);
+    if(slotEnd>now){
+      totalRemaining++;
+      if(!bookings.some(b=>b.date===today()&&i>=b.startIdx&&i<b.endIdx))freeRemaining++;
+    }
+  });
+  const freeHrs=(freeRemaining*15/60).toFixed(1);
+  const pct=totalRemaining>0?(freeRemaining/totalRemaining*100):0;
+  document.getElementById('free-bar-val').textContent=totalRemaining?`${freeHrs}h free`:'Day ended';
+  document.getElementById('free-bar-fill').style.width=pct+'%';
+}
+
+// ── Timeline ───────────────────────────────────────────────────
+function isPast(s){
+  if(selDate!==today())return false;
+  const now=new Date(),st=new Date();st.setHours(s.h,s.m,0,0);return st<now;
+}
+function bkAt(i){return bookings.find(b=>b.date===selDate&&i>=b.startIdx&&i<b.endIdx)||null}
+
+function renderTimeline(){
+  const g=document.getElementById('tl-grid');
+  g.style.gridTemplateColumns='repeat(9,60px)';
+  g.innerHTML=SLOTS.map((s,i)=>{
+    const bk=bkAt(i),past=isPast(s),sel=selSlots.includes(i);
+    const mine=bk&&bk.booker===cu.name;
+    let cls='tslot ';
+    if(bk&&mine)cls+='ts-mine';
+    else if(bk)cls+='ts-other';
+    else if(past)cls+='ts-past';
+    else if(sel)cls+='ts-sel';
+    else cls+='ts-free';
+    const tip=bk?`${escHtml(bk.booker)}: ${escHtml(bk.purpose)}`:(past?'Past':(sel?'Selected':'Free'));
+    return`<div class="${cls}" onclick="toggleSlot(${i})" title="${s.label} — ${tip}">${s.c}</div>`;
+  }).join('');
+
+  // Now-line position
+  positionNowLine();
+
+  updateSelUI();
+}
+
+function positionNowLine(){
+  // remove old
+  document.querySelectorAll('.now-line').forEach(e=>e.remove());
+  if(selDate!==today())return;
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes();
+  if(h<H0||h>=HE)return;
+
+  const totalMins=(HE-H0)*60;
+  const elapsedMins=(h-H0)*60+m;
+  const pct=elapsedMins/totalMins;
+
+  const card=document.getElementById('tl-card');
+  const grid=document.getElementById('tl-grid');
+  // We need to position relative to the grid width
+  // Each slot = 60px + 3px gap. 9 cols = (60*9)+(3*8) = 540+24 = 564px per row
+  // total 4 rows = but we want horizontal position only
+  const slotW=60,gapW=3,cols=9;
+  const totalW=cols*(slotW+gapW)-gapW;
+  const xPx=pct*totalW;
+
+  const line=document.createElement('div');
+  line.className='now-line';
+  line.style.left=(xPx+10)+'px'; // +10 for card padding
+  line.innerHTML='<div class="now-dot"></div>';
+  card.appendChild(line);
+}
+
+function updateSelUI(){
+  const n=selSlots.length;
+  const btn=document.getElementById('bk-sel');
+  const ctr=document.getElementById('dur-counter');
+  if(n>0){
+    const mins=n*15;
+    const label=mins<60?`${mins} min`:mins%60===0?`${mins/60}h`:`${Math.floor(mins/60)}h ${mins%60}m`;
+    document.getElementById('dur-txt').textContent=`${label} selected — tap "Book" to confirm`;
+    document.getElementById('bk-sel-txt').textContent=`Book ${label}`;
+    btn.classList.add('show');
+    ctr.classList.add('show');
+  }else{
+    btn.classList.remove('show');
+    ctr.classList.remove('show');
+  }
+}
+
+function toggleSlot(i){
+  const s=SLOTS[i];
+  if(isPast(s)||bkAt(i))return;
+  const pos=selSlots.indexOf(i);
+  if(pos===-1){
+    if(!selSlots.length){selSlots=[i]}
+    else{
+      const mn=Math.min(...selSlots),mx=Math.max(...selSlots);
+      if(i===mn-1||i===mx+1){selSlots.push(i);selSlots.sort((a,b)=>a-b)}
+      else{selSlots=[i]}
+    }
+  }else{
+    const mn=Math.min(...selSlots),mx=Math.max(...selSlots);
+    if(i===mn||i===mx)selSlots.splice(pos,1);
+    else{
+      // clicking middle — shrink from nearest edge
+      if(i-mn<mx-i)selSlots=selSlots.filter(x=>x>=i);
+      else selSlots=selSlots.filter(x=>x<=i);
     }
   }
-  const TOTAL_SLOTS = SLOTS.length;
-
-  function slotIndex(h, m) { return SLOTS.findIndex(s => s.hour === h && s.min === m); }
-  function slotLabel(idx)  { return (idx >= 0 && idx < SLOTS.length) ? SLOTS[idx].label : "—"; }
-
-  // ── Date helpers ────────────────────────────────────────────
-  function dateKey(d) {
-    // YYYY-MM-DD
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  }
-  function todayKey() { return dateKey(new Date()); }
-  function keyToDate(k) {
-    const [y,mo,d] = k.split("-").map(Number);
-    return new Date(y, mo-1, d);
-  }
-  function isFuture(k) { return k >= todayKey(); }
-
-  // ── Persistence ─────────────────────────────────────────────
-  function loadBookings() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
-  }
-  function saveBookings() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings)); } catch {}
-  }
-
-  // ── State ───────────────────────────────────────────────────
-  let bookings      = loadBookings();
-  let nextId        = bookings.length ? Math.max(...bookings.map(b => b.id)) + 1 : 1;
-  let selectedSlots = [];
-  let currentFilter = "all";
-  let stripOffset   = 0;   // week offset from today
-  let selectedDate  = todayKey();
-
-  // ── Helpers ─────────────────────────────────────────────────
-  function bookingsForDate(dk) {
-    return bookings.filter(b => b.date === dk);
-  }
-  function isBooked(idx, dk) {
-    return bookingsForDate(dk).some(b => idx >= b.startIdx && idx < b.endIdx);
-  }
-  function bookingAt(idx, dk) {
-    return bookingsForDate(dk).find(b => idx >= b.startIdx && idx < b.endIdx);
-  }
-  function isRoomFreeNow() {
-    const now = new Date();
-    const h = now.getHours(), m = now.getMinutes();
-    const roundM = Math.floor(m / 15) * 15;
-    const idx = slotIndex(h, roundM);
-    if (idx < 0) return true;
-    return !isBooked(idx, todayKey());
-  }
-  function isPastSlot(slot) {
-    if (selectedDate !== todayKey()) return false;
-    const now = new Date();
-    const slotTime = new Date(); slotTime.setHours(slot.hour, slot.min, 0, 0);
-    return slotTime < now;
-  }
-  function durationLabel(s, e) {
-    const mins = (e - s) * 15;
-    if (mins < 60) return `${mins} min`;
-    const h = Math.floor(mins/60), r = mins%60;
-    return r ? `${h}h ${r}m` : `${h}h`;
-  }
-  function friendlyDate(dk) {
-    const tk = todayKey();
-    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-    const tmKey = dateKey(tomorrow);
-    if (dk === tk) return "Today";
-    if (dk === tmKey) return "Tomorrow";
-    const d = keyToDate(dk);
-    return `${DAYS_LABEL[d.getDay()]}, ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
-  }
-
-  // ── Topbar date ─────────────────────────────────────────────
-  function updateTopbar() {
-    const d = keyToDate(selectedDate);
-    document.getElementById("topbar-date-str").textContent =
-      `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
-    document.getElementById("topbar-day-str").textContent = DAYS_LABEL[d.getDay()];
-  }
-
-  // ── Date strip ──────────────────────────────────────────────
-  function buildStrip() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const startDay = new Date(today);
-    startDay.setDate(today.getDate() + stripOffset * 7);
-
-    // Show 14 days from startDay
-    const days = [];
-    for (let i = 0; i < 14; i++) {
-      const d = new Date(startDay);
-      d.setDate(startDay.getDate() + i);
-      days.push(d);
-    }
-
-    const firstDay = days[0], lastDay = days[days.length-1];
-    // Range label
-    const rangeStr = firstDay.getMonth() === lastDay.getMonth()
-      ? `${MONTHS_SHORT[firstDay.getMonth()]} ${firstDay.getFullYear()}`
-      : `${MONTHS_SHORT[firstDay.getMonth()]} – ${MONTHS_SHORT[lastDay.getMonth()]}`;
-    document.getElementById("nav-range-label").textContent = rangeStr;
-    document.getElementById("strip-month-label").textContent = "Select date";
-
-    // Disable prev if today would go before today
-    document.getElementById("nav-prev").disabled = stripOffset <= 0;
-
-    const container = document.getElementById("date-days");
-    container.innerHTML = "";
-
-    days.forEach(d => {
-      const dk = dateKey(d);
-      const isToday = dk === todayKey();
-      const isActive = dk === selectedDate;
-      const hasB = bookingsForDate(dk).length > 0;
-      const inPast = dk < todayKey();
-
-      const pill = document.createElement("div");
-      pill.className = "day-pill"
-        + (isActive ? " active" : "")
-        + (isToday && !isActive ? " today-pill" : "")
-        + (hasB ? " has-bookings" : "");
-      if (inPast && !isActive) pill.style.opacity = "0.45";
-
-      pill.innerHTML = `
-        <div class="day-pill-dow">${DAYS_LABEL[d.getDay()]}</div>
-        <div class="day-pill-num">${d.getDate()}</div>
-        <div class="day-pill-dot"></div>
-      `;
-      pill.onclick = () => selectDate(dk);
-      container.appendChild(pill);
-
-      // Scroll active into view
-      if (isActive) setTimeout(() => pill.scrollIntoView({ inline:"center", behavior:"smooth", block:"nearest" }), 50);
-    });
-  }
-
-  function shiftWeek(dir) {
-    if (dir < 0 && stripOffset <= 0) return;
-    stripOffset += dir;
-    buildStrip();
-  }
-
-  function selectDate(dk) {
-    selectedDate = dk;
-    selectedSlots = [];
-    updateTopbar();
-    buildStrip();
-    renderRoomStatus();
-    renderTimeline();
-    renderBookings();
-    updateSectionLabels();
-  }
-
-  function updateSectionLabels() {
-    const label = friendlyDate(selectedDate);
-    document.getElementById("avail-section-title").textContent =
-      label === "Today" ? "Today's availability" : `Availability — ${label}`;
-  }
-
-  // ── Room status ─────────────────────────────────────────────
-  function renderRoomStatus() {
-    const el = document.getElementById("room-status-badge");
-    if (selectedDate !== todayKey()) {
-      const hasBks = bookingsForDate(selectedDate).length > 0;
-      el.textContent = hasBks ? "Has bookings" : "Open all day";
-      el.className = "room-status-badge " + (hasBks ? "badge-busy" : "badge-free");
-      return;
-    }
-    const free = isRoomFreeNow();
-    el.textContent = free ? "Available now" : "In use";
-    el.className = "room-status-badge " + (free ? "badge-free" : "badge-busy");
-  }
-
-  // ── Timeline ────────────────────────────────────────────────
-  function renderTimeline() {
-    const grid = document.getElementById("timeline-grid");
-    const cols = 9; // 9 cols = cleaner row breaks
-    grid.style.gridTemplateColumns = `repeat(${cols}, 58px)`;
-
-    grid.innerHTML = SLOTS.map((s, i) => {
-      const past   = isPastSlot(s);
-      const booked = isBooked(i, selectedDate);
-      const sel    = selectedSlots.includes(i);
-
-      let cls = "tslot";
-      if      (booked) cls += " booked";
-      else if (past)   cls += " past";
-      else if (sel)    cls += " selected";
-      else             cls += " free";
-
-      const b   = booked ? bookingAt(i, selectedDate) : null;
-      const tip = booked ? `${b.booker}: ${b.purpose}` : (sel ? "Selected" : (past ? "Past" : "Available"));
-
-      return `<div class="${cls}" onclick="toggleSlot(${i})" title="${s.label} — ${tip}">${s.compact}</div>`;
-    }).join("");
-
-    document.getElementById("book-sel-btn").style.display = selectedSlots.length ? "inline-flex" : "none";
-  }
-
-  function toggleSlot(idx) {
-    const s = SLOTS[idx];
-    if (isPastSlot(s) || isBooked(idx, selectedDate)) return;
-
-    const pos = selectedSlots.indexOf(idx);
-    if (pos === -1) {
-      if (selectedSlots.length === 0) {
-        selectedSlots = [idx];
-      } else {
-        const mn = Math.min(...selectedSlots), mx = Math.max(...selectedSlots);
-        if (idx === mn - 1 || idx === mx + 1) {
-          selectedSlots.push(idx); selectedSlots.sort((a,b) => a-b);
-        } else {
-          selectedSlots = [idx];
-        }
-      }
-    } else {
-      const mn = Math.min(...selectedSlots), mx = Math.max(...selectedSlots);
-      if (idx === mn || idx === mx) selectedSlots.splice(pos, 1);
-    }
-    renderTimeline();
-  }
-
-  // ── Render bookings ─────────────────────────────────────────
-  function renderBookings() {
-    let filtered = [...bookings];
-    if (currentFilter === "mine")     filtered = filtered.filter(b => b.booker === ME);
-    if (currentFilter === "selected") filtered = filtered.filter(b => b.date === selectedDate);
-    filtered.sort((a, b) => {
-      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
-      return a.startIdx - b.startIdx;
-    });
-
-    document.getElementById("booking-count").textContent =
-      `${filtered.length} booking${filtered.length !== 1 ? "s" : ""}`;
-
-    const list = document.getElementById("bookings-list");
-    if (!filtered.length) {
-      list.innerHTML = `<div class="empty-state">
-        <i class="ti ti-calendar-off"></i>
-        No bookings ${currentFilter === "selected" ? "on this day" : "yet"}
-        <p>Tap "New booking" to reserve the conference room.</p>
-      </div>`;
-      return;
-    }
-
-    list.innerHTML = filtered.map(b => {
-      const mine = b.booker === ME;
-      const dur  = durationLabel(b.startIdx, b.endIdx);
-      const dateTag = b.date !== selectedDate ? `<span class="bc-date-tag">${friendlyDate(b.date)}</span>` : "";
-      return `<div class="booking-card ${mine ? "mine" : "other"}" onclick="openDetail(${b.id})">
-        <div class="bc-top">
-          <div>
-            <div class="bc-title">${b.purpose}</div>
-            <div class="bc-meta-row">
-              <div class="bc-time">
-                <i class="ti ti-clock" style="font-size:11px;"></i>
-                ${slotLabel(b.startIdx)} – ${slotLabel(b.endIdx)} · ${dur}
-              </div>
-              ${dateTag}
-            </div>
-          </div>
-          <span class="bc-badge ${mine ? "badge-mine" : "badge-other"}">${mine ? "Mine" : "Booked"}</span>
-        </div>
-        <div class="bc-row">
-          <div class="bc-avatar ${mine ? "" : "other"}">${b.initials}</div>
-          <span class="bc-name">${b.booker}</span>
-          ${b.attendees ? `<span style="font-size:11px;color:var(--text-tertiary);margin-left:auto;"><i class="ti ti-users" style="font-size:12px;"></i> ${b.attendees}</span>` : ""}
-        </div>
-        <div class="bc-actions" onclick="event.stopPropagation()">
-          <button class="bc-btn primary" onclick="openDetail(${b.id})"><i class="ti ti-eye" style="font-size:12px;"></i> Details</button>
-          ${mine
-            ? `<button class="bc-btn danger" onclick="cancelBooking(${b.id})"><i class="ti ti-trash" style="font-size:12px;"></i> Cancel</button>`
-            : `<button class="bc-btn" onclick="openReschedule(${b.id})"><i class="ti ti-refresh" style="font-size:12px;"></i> Request reschedule</button>`}
-        </div>
-      </div>`;
-    }).join("");
-  }
-
-  function setFilter(f, el) {
-    currentFilter = f;
-    document.querySelectorAll(".ftab").forEach(t => t.classList.remove("active"));
-    el.classList.add("active");
-    renderBookings();
-  }
-
-  // ── Modal helpers ───────────────────────────────────────────
-  function openModal(html) {
-    document.getElementById("modal-inner").innerHTML = html;
-    document.getElementById("modal-overlay").classList.add("open");
-  }
-  function closeModal() {
-    document.getElementById("modal-overlay").classList.remove("open");
-    document.getElementById("modal-inner").innerHTML = "";
-  }
-  function showToast(msg) {
-    const bar = document.getElementById("toast-bar");
-    document.getElementById("toast-msg").textContent = msg;
-    bar.classList.add("show");
-    setTimeout(() => bar.classList.remove("show"), 3200);
-  }
-  function slotOpts(selIdx) {
-    return SLOTS.map((s, i) =>
-      `<option value="${i}" ${i === selIdx ? "selected" : ""}>${s.label}</option>`
-    ).join("");
-  }
-
-  // ── Book modal ──────────────────────────────────────────────
-  function openBookModal() {
-    const defStart = selectedSlots.length ? Math.min(...selectedSlots) : slotIndex(9, 0);
-    const defEnd   = selectedSlots.length ? Math.max(...selectedSlots) + 1 : slotIndex(10, 0);
-    const endClamped = defEnd >= TOTAL_SLOTS ? TOTAL_SLOTS - 1 : defEnd;
-
-    openModal(`
-      <h3><i class="ti ti-calendar-plus" style="color:var(--green);font-size:18px;"></i>Book conference room</h3>
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:1rem;padding:8px 10px;background:var(--bg-secondary);border-radius:var(--radius-md);">
-        <i class="ti ti-calendar" style="font-size:12px;"></i> &nbsp;${friendlyDate(selectedDate)}
-      </div>
-      <label>Your name *</label>
-      <input type="text" id="f-name" placeholder="Enter your name" />
-      <label>Purpose / meeting title *</label>
-      <input type="text" id="f-purpose" placeholder="e.g. Sprint planning" />
-      <label>Start time *</label>
-      <select id="f-start">${slotOpts(defStart)}</select>
-      <label>End time *</label>
-      <select id="f-end">${slotOpts(endClamped)}</select>
-      <label>Number of attendees</label>
-      <input type="number" id="f-att" min="1" max="10" value="1" />
-      <label>Notes (optional)</label>
-      <textarea id="f-notes" placeholder="Agenda, AV requirements, etc."></textarea>
-      <div id="form-error" class="field-error" style="margin-top:10px;"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" onclick="confirmBooking()">Confirm booking</button>
-      </div>`);
-  }
-
-  function confirmBooking() {
-    const name      = document.getElementById("f-name").value.trim();
-    const purpose   = document.getElementById("f-purpose").value.trim();
-    const startIdx  = parseInt(document.getElementById("f-start").value);
-    const endIdx    = parseInt(document.getElementById("f-end").value);
-    const att       = Math.min(parseInt(document.getElementById("f-att").value) || 1, 10);
-    const notes     = document.getElementById("f-notes").value.trim();
-    const errEl     = document.getElementById("form-error");
-
-    errEl.textContent = "";
-    let err = false;
-    if (!name)          { document.getElementById("f-name").classList.add("error-outline"); err = true; }
-    if (!purpose)       { document.getElementById("f-purpose").classList.add("error-outline"); err = true; }
-    if (endIdx <= startIdx) {
-      document.getElementById("f-end").classList.add("error-outline");
-      errEl.textContent = "End time must be after start time."; err = true;
-    }
-    if (err) return;
-
-    // Conflict check
-    const conflict = bookingsForDate(selectedDate).some(b =>
-      !(endIdx <= b.startIdx || startIdx >= b.endIdx)
-    );
-    if (conflict) {
-      errEl.textContent = "This slot overlaps with an existing booking. Please choose another time.";
-      return;
-    }
-
-    const isSelf   = name.toLowerCase() === "you";
-    const initials = isSelf ? MI : name.split(" ").map(w => w[0]?.toUpperCase() || "").slice(0, 2).join("") || "?";
-    bookings.push({
-      id: nextId++,
-      booker: isSelf ? ME : name,
-      initials,
-      purpose,
-      startIdx,
-      endIdx,
-      date: selectedDate,
-      attendees: att,
-      notes
-    });
-    selectedSlots = [];
-    saveBookings();
-    closeModal();
-    buildStrip(); // refresh dots
-    renderRoomStatus(); renderTimeline(); renderBookings();
-    showToast(`Room booked for ${friendlyDate(selectedDate)}`);
-  }
-
-  // ── Detail modal ────────────────────────────────────────────
-  function openDetail(id) {
-    const b = bookings.find(x => x.id === id); if (!b) return;
-    const mine = b.booker === ME;
-    const dur  = durationLabel(b.startIdx, b.endIdx);
-    openModal(`
-      <h3><i class="ti ti-info-circle" style="color:var(--green);font-size:18px;"></i>Booking details</h3>
-      <div class="detail-row"><span class="detail-label">Room</span><span class="detail-value">Conference Room</span></div>
-      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${friendlyDate(b.date)}</span></div>
-      <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">Ground Floor, Block B</span></div>
-      <div class="detail-row"><span class="detail-label">Booked by</span><span class="detail-value">${b.booker}</span></div>
-      <div class="detail-row"><span class="detail-label">Purpose</span><span class="detail-value">${b.purpose}</span></div>
-      <div class="detail-row"><span class="detail-label">Start</span><span class="detail-value">${slotLabel(b.startIdx)}</span></div>
-      <div class="detail-row"><span class="detail-label">End</span><span class="detail-value">${slotLabel(b.endIdx)}</span></div>
-      <div class="detail-row"><span class="detail-label">Duration</span><span class="detail-value">${dur}</span></div>
-      <div class="detail-row"><span class="detail-label">Attendees</span><span class="detail-value">${b.attendees}</span></div>
-      ${b.notes ? `<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">${b.notes}</span></div>` : ""}
-      <div class="modal-actions">
-        ${!mine
-          ? `<button class="btn-cancel" onclick="closeModal();setTimeout(()=>openReschedule(${b.id}),50)"><i class="ti ti-refresh" style="font-size:13px;"></i> Request reschedule</button>`
-          : `<button class="btn-cancel" style="color:var(--red-darker);border-color:var(--red-mid);" onclick="cancelBooking(${b.id})"><i class="ti ti-trash" style="font-size:13px;"></i> Cancel</button>`}
-        <button class="btn-confirm" onclick="closeModal()">Close</button>
-      </div>`);
-  }
-
-  // ── Reschedule modal ────────────────────────────────────────
-  function openReschedule(id) {
-    const b = bookings.find(x => x.id === id); if (!b) return;
-    openModal(`
-      <h3><i class="ti ti-refresh" style="color:var(--green);font-size:18px;"></i>Request reschedule</h3>
-      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:1rem;">
-        Requesting a reschedule for <strong style="color:var(--text-primary);">${b.purpose}</strong> booked by ${b.booker}.
-      </p>
-      <label>Preferred new start time</label>
-      <select id="rs-start">${slotOpts(b.startIdx)}</select>
-      <label>Preferred new end time</label>
-      <select id="rs-end">${slotOpts(b.endIdx)}</select>
-      <label>Reason for request *</label>
-      <textarea id="rs-reason" placeholder="Briefly explain why you need this slot…"></textarea>
-      <div id="rs-error" class="field-error" style="margin-top:8px;"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" onclick="sendReschedule(${id})">Send request</button>
-      </div>`);
-  }
-
-  function sendReschedule(id) {
-    const reason = document.getElementById("rs-reason").value.trim();
-    if (!reason) {
-      document.getElementById("rs-reason").classList.add("error-outline");
-      document.getElementById("rs-error").textContent = "Please provide a reason.";
-      return;
-    }
-    closeModal();
-    showToast("Reschedule request sent");
-  }
-
-  // ── Cancel ──────────────────────────────────────────────────
-  function cancelBooking(id) {
-    if (!confirm("Cancel this booking?")) return;
-    bookings = bookings.filter(b => b.id !== id);
-    saveBookings();
-    closeModal();
-    buildStrip();
-    renderRoomStatus(); renderTimeline(); renderBookings();
-    showToast("Booking cancelled");
-  }
-
-  // ── Init ────────────────────────────────────────────────────
-  updateTopbar();
-  buildStrip();
-  updateSectionLabels();
-  renderRoomStatus();
   renderTimeline();
-  renderBookings();
+}
+
+// ── Bookings ───────────────────────────────────────────────────
+function renderBookings(){
+  let list=[...bookings];
+  if(filt==='mine')list=list.filter(b=>b.booker===cu.name);
+  if(filt==='day')list=list.filter(b=>b.date===selDate);
+  list.sort((a,b)=>a.date!==b.date?(a.date<b.date?-1:1):a.startIdx-b.startIdx);
+  document.getElementById('bk-ct').textContent=`${list.length} booking${list.length!==1?'s':''}`;
+  const el=document.getElementById('bk-list');
+  if(!list.length){
+    el.innerHTML=`<div class="empty">
+      <div class="empty-icon"><i class="ti ti-calendar-off"></i></div>
+      <div class="empty-h">${filt==='day'?'Nothing on '+friendly(selDate):'No bookings yet'}</div>
+      <div class="empty-p">${filt==='mine'?'Rooms you book will appear here.':'Tap "Book room" to get started.'}</div>
+    </div>`;return;
+  }
+  el.innerHTML=list.map((b,idx)=>{
+    const mine=b.booker===cu.name,d=dur(b.startIdx,b.endIdx);
+    const dtag=b.date!==selDate?`<span class="bk-dtag">${friendly(b.date)}</span>`:'';
+    const acts=mine
+      ?`<button class="bc-btn bc-red" onclick="event.stopPropagation();confirmCancel(${b.id})"><i class="ti ti-trash" style="font-size:12px"></i>Cancel</button>`
+      :`<button class="bc-btn" onclick="event.stopPropagation();openReschedule(${b.id})"><i class="ti ti-refresh" style="font-size:12px"></i>Reschedule</button>`;
+    return`<div class="bk-card ${mine?'is-mine':'is-other'}" style="animation-delay:${idx*.04}s" onclick="openDetail(${b.id})">
+      <div class="bk-inner">
+        <div class="bk-top">
+          <div>
+            <div class="bk-title">${escHtml(b.purpose)}</div>
+            <div class="bk-time"><i class="ti ti-clock" style="font-size:11px"></i>${slbl(b.startIdx)} – ${slbl(b.endIdx)} · ${d}${dtag}</div>
+          </div>
+          <span class="bk-badge ${mine?'b-mine':'b-other'}">${mine?'Mine':'Booked'}</span>
+        </div>
+        <div class="bk-bot">
+          <div class="bk-av ${mine?'av-m':'av-o'}">${b.inits||'?'}</div>
+          <span class="bk-who">${escHtml(b.booker)}</span>
+          ${b.attendees?`<div class="bk-pax"><i class="ti ti-users" style="font-size:12px"></i>${b.attendees}</div>`:''}
+        </div>
+        <div class="bk-acts" onclick="event.stopPropagation()">
+          <button class="bc-btn bc-teal" onclick="openDetail(${b.id})"><i class="ti ti-eye" style="font-size:12px"></i>Details</button>
+          ${acts}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setF(f,el){filt=f;document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderBookings()}
+
+// ── Modal core ─────────────────────────────────────────────────
+function openModal(html){
+  document.getElementById('mb').innerHTML=html;
+  document.getElementById('modal-ov').classList.add('open');
+  // trap focus inside modal
+  setTimeout(()=>{const first=document.querySelector('#mb input,#mb select,#mb textarea,#mb button');if(first)first.focus()},60);
+}
+function closeModal(){
+  const ov=document.getElementById('modal-ov');
+  const sh=ov.querySelector('.modal-sheet');
+  if(sh){sh.style.animation='sheetDn .22s ease both'}
+  setTimeout(()=>{ov.classList.remove('open');document.getElementById('mb').innerHTML='';if(sh)sh.style.animation=''},220);
+}
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.className=`toast t-${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function sOpts(sel,filter){
+  return SLOTS.filter(filter||(_=>true)).map((s,i)=>`<option value="${s.i}"${s.i===sel?' selected':''}>${s.label}</option>`).join('');
+}
+
+// ── Book modal ─────────────────────────────────────────────────
+function openBook(){
+  const ds=selSlots.length?Math.min(...selSlots):sidx(9,0);
+  const de=selSlots.length?Math.max(...selSlots)+1:sidx(10,0);
+  const dec=Math.min(de,TOTAL-1);
+  openModal(`
+    <div class="m-hd">
+      <div class="m-hd-icon"><i class="ti ti-calendar-plus"></i></div>
+      <div><div class="m-hd-title">Book room</div><div class="m-hd-sub">Conference Room · Block B</div></div>
+    </div>
+    <div class="m-chip"><i class="ti ti-calendar"></i>${friendly(selDate)}</div>
+    <label>Booked by</label>
+    <input type="text" value="${escHtml(cu.name)}" readonly/>
+    <label>Meeting purpose *</label>
+    <input type="text" id="fp" placeholder="e.g. Design review, Sprint planning" autocomplete="off"/>
+    <label>Time *</label>
+    <div class="time-row">
+      <div><select id="fs">${sOpts(ds)}</select></div>
+      <div><select id="fe">${sOpts(dec)}</select></div>
+    </div>
+    <div id="time-dur" style="font-size:12px;color:var(--teal-d);font-weight:600;margin-top:5px"></div>
+    <label>Attendees</label>
+    <input type="number" id="fa" min="1" max="10" value="2"/>
+    <label>Notes (optional)</label>
+    <textarea id="fn" placeholder="Agenda, AV needs, dial-in link…"></textarea>
+    <div class="f-err-txt" id="ferr"></div>
+    <div class="m-acts">
+      <button class="m-sec" onclick="closeModal()">Cancel</button>
+      <button class="m-pri" onclick="confirmBook()">Confirm booking</button>
+    </div>`);
+  // live duration preview
+  function updDur(){
+    const s=parseInt(document.getElementById('fs').value),e=parseInt(document.getElementById('fe').value);
+    const el=document.getElementById('time-dur');
+    if(e>s){const m=(e-s)*15;el.textContent='Duration: '+dur(s,e)}
+    else el.textContent='';
+  }
+  setTimeout(()=>{
+    document.getElementById('fs').addEventListener('change',updDur);
+    document.getElementById('fe').addEventListener('change',updDur);
+    document.getElementById('fp').focus();
+    updDur();
+  },60);
+}
+
+function confirmBook(){
+  const p=document.getElementById('fp').value.trim();
+  const s=parseInt(document.getElementById('fs').value);
+  const e=parseInt(document.getElementById('fe').value);
+  const a=Math.min(parseInt(document.getElementById('fa').value)||1,10);
+  const n=document.getElementById('fn').value.trim();
+  const er=document.getElementById('ferr');
+  er.textContent='';let bad=false;
+  if(!p){document.getElementById('fp').classList.add('err-ol');er.textContent='Meeting purpose is required.';bad=true}
+  if(e<=s){document.getElementById('fe').classList.add('err-ol');er.textContent='End time must be after start time.';bad=true}
+  if(bad)return;
+  if(bookings.some(b=>b.date===selDate&&!(e<=b.startIdx||s>=b.endIdx))){
+    er.textContent='This time overlaps with an existing booking.';return;
+  }
+  bookings.push({id:nextId++,booker:cu.name,inits:cu.inits,purpose:p,startIdx:s,endIdx:e,date:selDate,attendees:a,notes:n});
+  selSlots=[];sb();closeModal();
+  setTimeout(()=>{buildStrip();renderStatus();renderFreeBar();renderTimeline();renderBookings()},240);
+  toast(`Booked for ${friendly(selDate)}`,'ok');
+}
+
+// ── Detail ─────────────────────────────────────────────────────
+function openDetail(id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  const mine=b.booker===cu.name,d=dur(b.startIdx,b.endIdx);
+  openModal(`
+    <div class="m-hd">
+      <div class="m-hd-icon"><i class="ti ti-info-circle"></i></div>
+      <div><div class="m-hd-title">${escHtml(b.purpose)}</div><div class="m-hd-sub">${friendly(b.date)} · ${d}</div></div>
+    </div>
+    <div class="det-grp">
+      <div class="det-row"><span class="det-lbl">Date</span><span class="det-val">${friendly(b.date)}</span></div>
+      <div class="det-row"><span class="det-lbl">Room</span><span class="det-val">Conference Room, Block B</span></div>
+      <div class="det-row"><span class="det-lbl">Booked by</span><span class="det-val">${escHtml(b.booker)}</span></div>
+      <div class="det-row"><span class="det-lbl">Time</span><span class="det-val">${slbl(b.startIdx)} – ${slbl(b.endIdx)}</span></div>
+      <div class="det-row"><span class="det-lbl">Duration</span><span class="det-val">${d}</span></div>
+      <div class="det-row"><span class="det-lbl">Attendees</span><span class="det-val">${b.attendees}</span></div>
+      ${b.notes?`<div class="det-row"><span class="det-lbl">Notes</span><span class="det-val">${escHtml(b.notes)}</span></div>`:''}
+    </div>
+    ${!mine?`<div class="lock-note"><i class="ti ti-lock"></i>Only ${escHtml(b.booker)} can cancel this booking.</div>`:''}
+    <div class="m-acts">
+      ${!mine
+        ?`<button class="m-sec" onclick="closeModal();setTimeout(()=>openReschedule(${b.id}),240)"><i class="ti ti-refresh" style="font-size:13px"></i>Request reschedule</button>`
+        :`<button class="m-red" onclick="confirmCancel(${b.id})"><i class="ti ti-trash" style="font-size:13px"></i>Cancel booking</button>`}
+      <button class="m-pri" onclick="closeModal()">Done</button>
+    </div>`);
+}
+
+// ── Cancel — inline confirm, no browser dialog ──────────────────
+function confirmCancel(id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  if(b.booker!==cu.name){toast('You can only cancel your own bookings','err');return}
+  // inject confirm UI into current modal body
+  const existing=document.getElementById('mb');
+  // append confirm panel below current content
+  const old=existing.querySelector('.del-confirm');if(old)old.remove();
+  const panel=document.createElement('div');
+  panel.className='del-confirm';
+  panel.innerHTML=`<p>Cancel <strong>${escHtml(b.purpose)}</strong> on ${friendly(b.date)}? This cannot be undone.</p>
+    <div class="del-confirm-acts">
+      <button class="m-sec" onclick="this.closest('.del-confirm').remove()" style="font-size:13px;padding:8px 14px">Keep it</button>
+      <button class="m-red" onclick="doCancelBk(${id})" style="font-size:13px;padding:8px 14px">Yes, cancel</button>
+    </div>`;
+  existing.appendChild(panel);
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function doCancelBk(id){
+  bookings=bookings.filter(b=>b.id!==id);sb();closeModal();
+  setTimeout(()=>{buildStrip();renderStatus();renderFreeBar();renderTimeline();renderBookings()},240);
+  toast('Booking cancelled','ok');
+}
+
+// ── Reschedule ─────────────────────────────────────────────────
+function openReschedule(id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  openModal(`
+    <div class="m-hd">
+      <div class="m-hd-icon"><i class="ti ti-refresh"></i></div>
+      <div><div class="m-hd-title">Request reschedule</div><div class="m-hd-sub">${escHtml(b.purpose)} · ${escHtml(b.booker)}</div></div>
+    </div>
+    <label>Preferred new start</label>
+    <select id="rss">${sOpts(b.startIdx)}</select>
+    <label>Preferred new end</label>
+    <select id="rse">${sOpts(b.endIdx)}</select>
+    <label>Reason for request *</label>
+    <textarea id="rsr" placeholder="Why do you need to move this?"></textarea>
+    <div class="f-err-txt" id="rserr"></div>
+    <div class="m-acts">
+      <button class="m-sec" onclick="closeModal()">Cancel</button>
+      <button class="m-pri" onclick="sendReschedule(${id})">Send request</button>
+    </div>`);
+}
+function sendReschedule(id){
+  const r=document.getElementById('rsr').value.trim();
+  if(!r){document.getElementById('rsr').classList.add('err-ol');document.getElementById('rserr').textContent='Please give a reason.';return}
+  closeModal();toast('Reschedule request sent to the room admin','ok');
+}
+
+// ── Escape HTML ────────────────────────────────────────────────
+function escHtml(s){
+  if(!s)return'';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ───────────────────────────────────────────────────────
+function init(){
+  lb();buildStrip();updateAvailLbl();
+  renderStatus();renderFreeBar();renderTimeline();renderBookings();
+  // update now-line every minute
+  setInterval(()=>{if(selDate===today()){renderStatus();renderFreeBar();renderTimeline()}},60000);
+}
+
+// ── Boot ───────────────────────────────────────────────────────
+const sv=lu();
+if(sv&&sv.name){cu=sv;document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';setupUI();init()}
 </script>
 </body>
 </html>
